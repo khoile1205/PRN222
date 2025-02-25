@@ -28,6 +28,8 @@ namespace BussinessLayer.ServiceManager
             #region Services
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
+
 
             #endregion
 

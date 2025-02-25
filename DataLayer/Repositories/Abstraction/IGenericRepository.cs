@@ -13,6 +13,7 @@ namespace DataLayer.Repositories.Abstraction
         Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null);
         Task CreateAsync(T entity);
         Task RemoveAsync(T entity);
+        Task UpdateAsync(T entity);
         Task SaveAsync();
     }
 }
