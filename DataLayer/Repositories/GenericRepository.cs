@@ -20,54 +20,100 @@ namespace DataLayer.Repositories
             _context = context;
             this._dbSet = _context.Set<T>();
         }
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
-        {
-            IQueryable<T> query = _dbSet;
 
-            if (filter != null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, Func<IQueryable<T>, IQueryable<T>>? includes = null)
+        {
+            try
             {
-                query = query.Where(filter);
-            }
-            if (!string.IsNullOrEmpty(includeProperties))
-            {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                IQueryable<T> query = _dbSet;
+
+                if (filter != null)
                 {
-                    query = query.Include(includeProp.Trim());
+                    query = query.Where(filter);
                 }
+
+                if (includes != null)
+                {
+                    query = includes(query);
+                }
+                return await query.ToListAsync();
             }
-            return await query.ToListAsync();
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching data: {ex.Message}", ex);
+            }
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public async Task<T> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>>? includes = null)
         {
-            IQueryable<T> query = _dbSet;
-            query = query.Where(filter);
-
-            if (!string.IsNullOrEmpty(includeProperties))
+            try
             {
-                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                IQueryable<T> query = _dbSet;
+                query = query.Where(filter);
+
+                if (includes != null)
                 {
-                    query = query.Include(includeProp.Trim());
+                    query = includes(query);
                 }
+
+                return await query.FirstOrDefaultAsync();
             }
-            return await query.FirstOrDefaultAsync();
+            catch (Exception ex)
+            {
+                throw new Exception($"Error fetching data: {ex.Message}", ex);
+            }
         }
 
         public async Task CreateAsync(T entity)
         {
-            await _dbSet.AddAsync(entity);
-            await SaveAsync();
+            try
+            {
+                await _dbSet.AddAsync(entity);
+                await SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating entity: {ex.Message}", ex);
+            }
         }
 
         public async Task RemoveAsync(T entity)
         {
-            _dbSet.Remove(entity);
-            await SaveAsync();
+            try
+            {
+                _dbSet.Remove(entity);
+                await SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error removing entity: {ex.Message}", ex);
+            }
+        }
+
+        public async Task UpdateAsync(T entity)
+        {
+            try
+            {
+                _dbSet.Attach(entity);
+                _context.Entry(entity).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating entity: {ex.Message}", ex);
+            }
         }
 
         public async Task SaveAsync()
         {
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error saving changes: {ex.Message}", ex);
+            }
         }
     }
 }

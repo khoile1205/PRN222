@@ -1,4 +1,5 @@
 ﻿using BussinessLayer.Services;
+using BussinessLayer.Services.Abstraction;
 using DataLayer.Entities;
 using DataLayer.Repositories;
 using DataLayer.Repositories.Abstraction;
@@ -28,10 +29,13 @@ namespace BussinessLayer.ServiceManager
             #region Services
 
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
+
 
             #endregion
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddScoped(typeof(IPaginationRepository<>), typeof(PaginationRepository<>));
         }
     }
 }

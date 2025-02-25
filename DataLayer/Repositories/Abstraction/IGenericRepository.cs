@@ -9,10 +9,11 @@ namespace DataLayer.Repositories.Abstraction
 {
     public interface IGenericRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null);
-        Task<T> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null);
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, Func<IQueryable<T>, IQueryable<T>>? includes = null);
+        Task<T> GetAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>>? includes = null);
         Task CreateAsync(T entity);
         Task RemoveAsync(T entity);
+        Task UpdateAsync(T entity);
         Task SaveAsync();
     }
 }

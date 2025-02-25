@@ -7,159 +7,205 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataLayer.Entities;
 using BussinessLayer.Services;
+using DataLayer.Enums;
+using System.Data;
+using BussinessLayer.Helper;
+using PresentationLayer.ViewModel;
 
 namespace PresentationLayer.Controllers
 {
-    public class UsersController : Controller
-    {
-        private readonly IUserService userService;
+	public class UsersController : Controller
+	{
+		private readonly IUserService userService;
+		private readonly IRoleService roleService;
 
-        public UsersController(IUserService userService)
-        {
-            this.userService = userService;
+		public UsersController(IUserService userService, IRoleService roleService)
+		{
+			this.userService = userService;
+			this.roleService = roleService;
+		}
+
+		// GET: Users
+		public async Task<IActionResult> Index()
+		{
+			var listUsers = await userService.GetAllUsers();
+			return View(listUsers);
+		}
+
+		public async Task<IActionResult> Details(string? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
+
+			var user = await userService.GetUserById(id);
+
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			return View(user);
+		}
+
+		public async Task<IActionResult> Create()
+		{
+			var roles = await roleService.GetAllRoles();
+			ViewData["RoleId"] = new SelectList(roles, "Id", "RoleName");
+			ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+										.Cast<Gender>()
+										.Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name");
+			return View();
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Create([Bind("UserName,Password,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,RoleId,StartDate,CreatedAt,UpdatedAt,DeletedAt")] User user)
+		{
+			ModelState.Remove("Role");
+
+			user.Id = Guid.NewGuid().ToString();
+			user.Role = await roleService.GetRoleById(user.RoleId);
+			user.Password = HashPasswordHelper.HashPassword(user.Password);
+			user.DeletedAt = null;
+
+			if (!ModelState.IsValid)
+			{
+				var roles = await roleService.GetAllRoles();
+				ViewData["RoleId"] = new SelectList(roles, "Id", "RoleName", user.RoleId);
+
+                TempData["ErrorMessage"] = "Failed to create user.";
+                return View(user);
+			}
+
+			await userService.CreateUser(user);
+            TempData["SuccessMessage"] = "User created successfully!";
+            await userService.SaveUser();
+
+			return RedirectToAction("Index");
+		}
+
+		public async Task<IActionResult> Edit(string? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
+
+			var user = await userService.GetUserById(id);
+			if (user == null)
+			{
+				return NotFound();
+			}
+
+			var roles = await roleService.GetAllRoles();
+			ViewData["RoleId"] = new SelectList(roles, "Id", "RoleName", user.RoleId);
+			ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+										.Cast<Gender>()
+										.Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name");
+			return View(user);
+		}
+
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(string id, [Bind("UserName,Password,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,RoleId,StartDate")]
+											User user)
+		{
+            user.Id = id;
+            ModelState.Remove("Role");
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    user.UpdatedAt = TimeHelper.GetVietnamTime();
+                    await userService.UpdateUser(user);
+                    await userService.SaveUser();
+
+                    TempData["SuccessMessage"] = "User updated successfully!";
+                    return RedirectToAction("Index");
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    TempData["ErrorMessage"] = "Data has been changed, please try again!";
+                }
+            }
+
+            var errors = ModelState.Values.SelectMany(v => v.Errors)
+                      .Select(e => e.ErrorMessage)
+                      .ToList();
+            Console.WriteLine(string.Join("\n", errors));
+            var roles = await roleService.GetAllRoles();
+            ViewData["RoleId"] = new SelectList(roles, "Id", "RoleName", user.RoleId);
+            return View(user);
         }
 
-        // GET: Users
-        public async Task<IActionResult> Index()
-        {
-            var listUsers = await userService.GetAllUsers();
-            return View(listUsers);
-        }
+		public IActionResult ResetPassword(string id)
+		{
+			var staff = userService.GetUserById(id);
+			if (staff == null)
+			{
+				return NotFound();
+			}
 
-        //// GET: Users/Details/5
-        //public async Task<IActionResult> Details(Guid? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+			var model = new ResetPasswordViewModel { StaffId = id };
+			return View(model);
+		}
 
-        //    var user = await _context.Users
-        //        .Include(u => u.Role)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
+		[HttpPost]
+		public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPassword)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(resetPassword);
+			}
 
-        //    return View(user);
-        //}
+			var staff = await userService.GetUserById(resetPassword.StaffId);
+			if (staff == null)
+			{
+				ModelState.AddModelError("", "Staff not found.");
+				return View(resetPassword);
+			}
 
-        //// GET: Users/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "RoleName");
-        //    return View();
-        //}
+			staff.Password = HashPasswordHelper.HashPassword(resetPassword.NewPassword);
+			await userService.UpdateUser(staff);
+			await userService.SaveUser();
 
-        //// POST: Users/Create
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("UserName,Password,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,RoleId,StartDate,Id,CreatedAt,UpdatedAt,DeletedAt")] User user)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        user.Id = Guid.NewGuid();
-        //        _context.Add(user);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "RoleName", user.RoleId);
-        //    return View(user);
-        //}
+			TempData["SuccessMessage"] = "Password reset successfully.";
+			return RedirectToAction("Index");
+		}
 
-        //// GET: Users/Edit/5
-        //public async Task<IActionResult> Edit(Guid? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+		[HttpPost]
+		public async Task<IActionResult> DeleteUser(string userId)
+		{
+			var user = await userService.GetUserById(userId);
+			if (user == null || user.DeletedAt != null)
+			{
+				return NotFound();
+			}
+			user.DeletedAt = TimeHelper.GetVietnamTime();
 
-        //    var user = await _context.Users.FindAsync(id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "RoleName", user.RoleId);
-        //    return View(user);
-        //}
+			await userService.UpdateUser(user);
+            TempData["SuccessMessage"] = "User deleted successfully!";
 
-        //// POST: Users/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(Guid id, [Bind("UserName,Password,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,RoleId,StartDate,Id,CreatedAt,UpdatedAt,DeletedAt")] User user)
-        //{
-        //    if (id != user.Id)
-        //    {
-        //        return NotFound();
-        //    }
+            return RedirectToAction("Index");
+		}
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(user);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!UserExists(user.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["RoleId"] = new SelectList(_context.Roles, "Id", "RoleName", user.RoleId);
-        //    return View(user);
-        //}
+		public async Task<IActionResult> RestoreUser(string userId)
+		{
+			var user = await userService.GetUserById(userId);
+			if (user == null || user.DeletedAt == null)
+			{
+				return NotFound();
+			}
 
-        //// GET: Users/Delete/5
-        //public async Task<IActionResult> Delete(Guid? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+			user.DeletedAt = null;
+			await userService.UpdateUser(user);
+            TempData["SuccessMessage"] = "User restored successfully!";
 
-        //    var user = await _context.Users
-        //        .Include(u => u.Role)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
+            return RedirectToAction("Index");
+		}
 
-        //    return View(user);
-        //}
-
-        //// POST: Users/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(Guid id)
-        //{
-        //    var user = await _context.Users.FindAsync(id);
-        //    if (user != null)
-        //    {
-        //        _context.Users.Remove(user);
-        //    }
-
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        //private bool UserExists(Guid id)
-        //{
-        //    return _context.Users.Any(e => e.Id == id);
-        //}
-    }
+	}
 }
