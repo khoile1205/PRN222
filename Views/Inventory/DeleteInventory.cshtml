@@ -1,0 +1,21 @@
+﻿@model Caffeine.Models.Inventory
+
+@{
+    ViewData["Title"] = "Delete Inventory";
+}
+
+<h1>Delete Inventory</h1>
+
+<form asp-action="DeleteInventory">
+    <div class="form-group">
+        <label asp-for="BeverageId" class="control-label">Beverage ID</label>
+        <input asp-for="BeverageId" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="Quantity" class="control-label">Quantity</label>
+        <input asp-for="Quantity" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+    </div>
+</form>

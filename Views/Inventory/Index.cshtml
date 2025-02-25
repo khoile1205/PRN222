@@ -1,0 +1,34 @@
+﻿@model List<Caffeine.Models.Inventory>
+
+@{
+    ViewData["Title"] = "Inventory";
+}
+
+<h1>Inventory Index</h1>
+
+<a asp-action="AddBeverage" class="btn btn-primary">Add Beverage</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Inventory ID</th>
+            <th>Beverage Name</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var inventory in Model)
+        {
+            <tr>
+                <td>@inventory.InventoryId</td>
+                <td>@inventory.Beverage?.Name</td>
+                <td>@inventory.Quantity</td>
+                <td>
+                    <a asp-action="UpdateInventory" asp-route-id="@inventory.InventoryId">Update</a>
+                    <a asp-action="DeleteInventory" asp-route-id="@inventory.InventoryId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

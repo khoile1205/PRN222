@@ -1,0 +1,26 @@
+﻿@model Caffeine.Models.Inventory
+
+@{
+    ViewData["Title"] = "Update Inventory";
+}
+
+<h1>Update Inventory</h1>
+
+<form asp-action="UpdateInventory">
+    <div class="form-group">
+        <label asp-for="InventoryId" class="control-label">Inventory ID</label>
+        <input asp-for="InventoryId" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="BeverageId" class="control-label">Beverage ID</label>
+        <input asp-for="BeverageId" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="Quantity" class="control-label">Quantity</label>
+        <input asp-for="Quantity" class="form-control" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Update" class="btn btn-primary" />
+    </div>
+</form>
