@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{4F255466-9441-457B-8C82-BD3D7196723E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{4F255466-9441-457B-8C82-BD3D7196723E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLayer", "DataLayer\DataLayer.csproj", "{F3196CF7-A547-4947-B7EF-487B6878082B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLayer", "DataLayer\DataLayer.csproj", "{F3196CF7-A547-4947-B7EF-487B6878082B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BussinessLayer", "BussinessLayer\BussinessLayer.csproj", "{EF22F1C9-EA21-4B22-9466-EC1D83CDEFD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BussinessLayer", "BussinessLayer\BussinessLayer.csproj", "{EF22F1C9-EA21-4B22-9466-EC1D83CDEFD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{54C1E6FB-9F27-47F9-A5AE-B08982A4936F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{EF22F1C9-EA21-4B22-9466-EC1D83CDEFD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF22F1C9-EA21-4B22-9466-EC1D83CDEFD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF22F1C9-EA21-4B22-9466-EC1D83CDEFD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54C1E6FB-9F27-47F9-A5AE-B08982A4936F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54C1E6FB-9F27-47F9-A5AE-B08982A4936F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54C1E6FB-9F27-47F9-A5AE-B08982A4936F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54C1E6FB-9F27-47F9-A5AE-B08982A4936F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

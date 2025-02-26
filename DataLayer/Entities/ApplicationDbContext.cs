@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Shared.Enums;
 
 namespace DataLayer.Entities
 {
@@ -94,14 +95,19 @@ namespace DataLayer.Entities
             );
 
 
-            modelBuilder.Entity<Role>().HasData(
+            modelBuilder.Entity<Role>()
+                .Property(r => r.RoleName)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Role>()
+                .HasData(
                 new Role
                 {
-                    RoleName = "Admin"
+                    RoleName = RoleEnum.Admin
                 },
                 new Role
                 {
-                    RoleName = "Staff"
+                    RoleName = RoleEnum.Staff
                 }
           );
 
