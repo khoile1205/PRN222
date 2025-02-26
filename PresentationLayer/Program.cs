@@ -1,3 +1,4 @@
+using BussinessLayer.Middleware;
 using BussinessLayer.ServiceManager;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseMiddleware<JwtMiddleware>();
 app.UseAuthorization();
 
 app.MapControllerRoute(
