@@ -1,0 +1,109 @@
+﻿@model DataLayer.Entities.User
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="card shadow-lg p-4">
+    <h2 class="text-center">
+        <i class="fa fa-user-plus"></i> Create New User
+    </h2>
+    <hr />
+
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="text-secondary"><i class="fa fa-id-badge"></i> Individual Information</h5>
+                <input asp-for="Id" type="hidden" />
+
+                <div class="form-group">
+                    <label asp-for="UserName" class="form-label fw-bold"></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label fw-bold"></label>
+                    <input asp-for="Password" type="password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="form-label fw-bold"></label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label fw-bold"></label>
+                    <input asp-for="Email" type="email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Avatar" class="form-label fw-bold"></label>
+                    <input asp-for="Avatar" class="form-control" />
+                    <span asp-validation-for="Avatar" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Name" class="form-label fw-bold"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DateOfBirth" class="form-label fw-bold"></label>
+                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Gender" class="form-label fw-bold"></label>
+                    <select asp-for="Gender" class="form-control" asp-items="ViewBag.GenderList"></select>
+                    <span asp-validation-for="Gender" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h5 class="text-secondary"><i class="fa fa-briefcase"></i> Working Information</h5>
+
+                <div class="form-group">
+                    <label asp-for="Position" class="form-label fw-bold"></label>
+                    <input asp-for="Position" class="form-control" />
+                    <span asp-validation-for="Position" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="RoleId" class="form-label fw-bold"></label>
+                    <select asp-for="RoleId" class="form-control" asp-items="ViewBag.RoleId"></select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="StartDate" class="form-label fw-bold"></label>
+                    <input asp-for="StartDate" type="date" class="form-control" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+
+                <input asp-for="DateOfBirth" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" hidden />
+                <input asp-for="StartDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" hidden />
+
+                <button type="submit" class="btn btn-success mt-3">
+                    <i class="fa fa-plus"></i> Create
+                </button>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-action="Index" class="btn btn-warning">
+                <i class="fa fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
