@@ -1,12 +1,13 @@
 using BussinessLayer.Middleware;
 using BussinessLayer.ServiceManager;
+using DataLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var dependencyInjection = new DependencyInjection();
 dependencyInjection.ConfigureServices(builder.Services, builder.Configuration);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -17,6 +18,13 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+    dbContext.SeedData();
 }
 
 app.UseHttpsRedirection();
