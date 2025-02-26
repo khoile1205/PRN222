@@ -73,21 +73,26 @@ namespace DataLayer.Entities
             modelBuilder.Entity<BeverageSize>().HasData(
                 new BeverageSize
                 {
+                    Id = "-1",
                     SizeName = Enums.BeverageSize.S.ToString()
                 },
                 new BeverageSize
                 {
+                    Id = "-2",
                     SizeName = Enums.BeverageSize.M.ToString()
                 },
                 new BeverageSize
                 {
+                    Id = "-3",
                     SizeName = Enums.BeverageSize.L.ToString()
                 },
                 new BeverageSize
                 {
+                    Id = "-4",
                     SizeName = Enums.BeverageSize.XL.ToString()
                 }
-           );
+            );
+
 
             modelBuilder.Entity<Role>().HasData(
                 new Role
