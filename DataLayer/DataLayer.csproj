@@ -17,10 +17,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+<<<<<<< HEAD
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
+=======
+>>>>>>> 5b1e981e424876fd498e9d70479f16e1896220ee
   </ItemGroup>
 
 </Project>
