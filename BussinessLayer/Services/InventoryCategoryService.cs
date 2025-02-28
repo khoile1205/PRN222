@@ -73,8 +73,11 @@ namespace BussinessLayer.Services
             try
             {
                 var category = await GetInventoryCategoryByIdAsync(id);
-                if (category != null)
-                    await _categoryRepository.RemoveAsync(category);
+                if (category == null)
+                    throw new Exception("Category not found");
+
+                category.DeletedAt = DateTime.UtcNow;
+                await _categoryRepository.UpdateAsync(category);
             }
             catch (Exception ex)
             {
