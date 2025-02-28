@@ -6,34 +6,39 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DataLayer.Entities;
+using BussinessLayer.Services.Abstraction;
+using BussinessLayer.Services;
+using BussinessLayer.Helper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class VouchersController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IVoucherService _voucherService;
 
-        public VouchersController(ApplicationDbContext context)
+        public VouchersController(IVoucherService voucherService)
         {
-            _context = context;
+            _voucherService = voucherService;
         }
 
-        // GET: Vouchers
+        // GET: Vouchers/Index
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Vouchers.ToListAsync());
+            var vouchers = await _voucherService.GetAllVouchersAsync();
+            return View(vouchers);
         }
 
-        // GET: Vouchers/Details/5
+        // GET: Vouchers/Details/{id}
         public async Task<IActionResult> Details(string id)
         {
-            if (id == null)
+            if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
 
-            var voucher = await _context.Vouchers
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var voucher = await _voucherService.GetVoucherByIdAsync(id);
             if (voucher == null)
             {
                 return NotFound();
@@ -43,36 +48,45 @@ namespace PresentationLayer.Controllers
         }
 
         // GET: Vouchers/Create
-        public IActionResult Create()
-        {
+        public IActionResult Create() 
+        { 
             return View();
         }
 
         // POST: Vouchers/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Code,Percentage,Description,MaxDiscountAmount,Amount,StartDate,EndDate,Id,CreatedAt,UpdatedAt,DeletedAt")] Voucher voucher)
+        public async Task<IActionResult> Create([Bind("Percentage,Description,MaxDiscountAmount,Amount,StartDate,EndDate")] Voucher voucher)
         {
-            if (ModelState.IsValid)
+            ModelState.Remove("Code");
+            ModelState.Remove("CreatedAt");
+            ModelState.Remove("UpdatedAt");
+            ModelState.Remove("DeletedAt");
+
+            // Khởi tạo các giá trị tự động
+            voucher.Id = Guid.NewGuid().ToString();
+            voucher.DeletedAt = null;
+
+            if (!ModelState.IsValid)
             {
-                _context.Add(voucher);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = "Failed to create voucher.";
+                return View(voucher);
             }
-            return View(voucher);
+
+            await _voucherService.CreateVoucherAsync(voucher);
+            TempData["SuccessMessage"] = "Voucher created successfully!";
+            return RedirectToAction("Index");
         }
 
         // GET: Vouchers/Edit/5
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var voucher = await _context.Vouchers.FindAsync(id);
+            var voucher = await _voucherService.GetVoucherByIdAsync(id);
             if (voucher == null)
             {
                 return NotFound();
@@ -80,77 +94,57 @@ namespace PresentationLayer.Controllers
             return View(voucher);
         }
 
-        // POST: Vouchers/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Vouchers/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Code,Percentage,Description,MaxDiscountAmount,Amount,StartDate,EndDate,Id,CreatedAt,UpdatedAt,DeletedAt")] Voucher voucher)
+        public async Task<IActionResult> Edit(string id, [Bind("Percentage,Description,MaxDiscountAmount,Amount,StartDate,EndDate")] Voucher voucher)
         {
-            if (id != voucher.Id)
+            voucher.Id = id;
+            ModelState.Remove("Code");
+            ModelState.Remove("CreatedAt");
+            ModelState.Remove("UpdatedAt");
+            ModelState.Remove("DeletedAt");
+
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                              .Select(e => e.ErrorMessage)
+                              .ToList();
+                Console.WriteLine(string.Join("\n", errors));
+                return View(voucher);
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(voucher);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!VoucherExists(voucher.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                voucher.UpdatedAt = TimeHelper.GetVietnamTime();
+                await _voucherService.UpdateVoucherAsync(voucher);
+                TempData["SuccessMessage"] = "Voucher updated successfully!";
+                return RedirectToAction("Index");
             }
-            return View(voucher);
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["ErrorMessage"] = "Data has been changed, please try again!";
+                return View(voucher);
+            }
         }
 
         // GET: Vouchers/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
-            if (id == null)
-            {
+            var voucher = await _voucherService.GetVoucherByIdAsync(id);
+            if(voucher == null)
                 return NotFound();
-            }
-
-            var voucher = await _context.Vouchers
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (voucher == null)
-            {
-                return NotFound();
-            }
 
             return View(voucher);
         }
 
-        // POST: Vouchers/Delete/5
+        // POST: Vouchers/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var voucher = await _context.Vouchers.FindAsync(id);
-            if (voucher != null)
-            {
-                _context.Vouchers.Remove(voucher);
-            }
-
-            await _context.SaveChangesAsync();
+            await _voucherService.DeleteVoucherAsync(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool VoucherExists(string id)
-        {
-            return _context.Vouchers.Any(e => e.Id == id);
         }
     }
 }
