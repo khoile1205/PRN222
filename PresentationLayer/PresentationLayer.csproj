@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BussinessLayer\BussinessLayer.csproj" />
+	  <ProjectReference Include="..\DataLayer\DataLayer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

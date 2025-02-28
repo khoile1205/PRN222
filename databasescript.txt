@@ -1,0 +1,37 @@
+INSERT INTO [CaffeShop].[dbo].[InventoryCategories] 
+    ([Id], [CategoryName], [CreatedAt], [UpdatedAt], [DeletedAt])
+VALUES 
+    ('1', 'Coffee Beans', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('2', 'Tea Leaves', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('3', 'Milk Products', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('4', 'Syrups', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('5', 'Pastries', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('6', 'Cups and Lids', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('7', 'Sugar and Sweeteners', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('8', 'Cleaning Supplies', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('9', 'Equipment Parts', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('10', 'Miscellaneous', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL);
+
+INSERT INTO [CaffeShop].[dbo].[Inventories] 
+    ([Id], [Name], [CategoryId], [Unit], [Description], [Quantity], [CreatedAt], [UpdatedAt], [DeletedAt])
+VALUES 
+    ('1', 'Robusta Coffee Beans', '1', 'kg', 'Strong Robusta beans from Vietnam', '8', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('2', 'Green Tea Leaves', '2', 'kg', 'Organic green tea from Japan', '3', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('3', 'Skimmed Milk', '3', 'liter', 'Low-fat milk for lighter drinks', '4', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('4', 'Vanilla Syrup', '4', 'liter', 'Sweet vanilla flavoring', '2', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('5', 'Croissants', '5', 'unit', 'Freshly baked butter croissants', '15', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('6', 'Paper Cups (12oz)', '6', 'pack', 'Pack of 50 disposable cups', '10', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('7', 'Brown Sugar', '7', 'kg', 'Natural brown sugar for coffee', '5', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('8', 'Dish Soap', '8', 'liter', 'Cleaning solution for dishes', '3', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('9', 'Espresso Machine Filter', '9', 'unit', 'Replacement filter for espresso machine', '2', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('10', 'Stir Sticks', '10', 'pack', 'Pack of 100 wooden stir sticks', '20', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('11', 'Black Tea Leaves', '2', 'kg', 'Classic black tea from India', '4', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('12', 'Caramel Syrup', '4', 'liter', 'Rich caramel flavoring', '1', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('13', 'Muffins', '5', 'unit', 'Blueberry muffins, freshly baked', '12', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('14', 'Cup Lids (12oz)', '6', 'pack', 'Pack of 50 lids for 12oz cups', '8', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('15', 'White Sugar', '7', 'kg', 'Granulated white sugar', '6', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('16', 'Sanitizer Wipes', '8', 'pack', 'Pack of 100 disinfectant wipes', '5', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('17', 'Grinder Blade', '9', 'unit', 'Replacement blade for coffee grinder', '1', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('18', 'Napkins', '10', 'pack', 'Pack of 200 paper napkins', '15', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('19', 'Arabica Coffee Beans', '1', 'kg', 'Premium Arabica beans from Colombia', '10', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
+    ('20', 'Whole Milk', '3', 'liter', 'Fresh whole milk for lattes', '5', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL);
