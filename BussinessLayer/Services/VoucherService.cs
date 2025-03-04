@@ -31,7 +31,6 @@ namespace BussinessLayer.Services
 
         public async Task CreateVoucherAsync(Voucher voucher)
         {
-            // Nếu Code chưa được cung cấp, sinh tự động Code mới.
             if (string.IsNullOrEmpty(voucher.Code))
             {
                 voucher.Code = await GenerateVoucherCodeAsync();
@@ -70,28 +69,9 @@ namespace BussinessLayer.Services
 
         private async Task<string> GenerateVoucherCodeAsync()
         {
-            var vouchers = await _voucherRepository.GetAllAsync();
-            var currentTime = TimeHelper.GetVietnamTime();
-            // Lấy danh sách các số code của các voucher đang hoạt động
-            var activeVoucherNumbers = new HashSet<int>();
-            foreach (var v in vouchers)
-            {
-                if (!string.IsNullOrEmpty(v.Code) && v.Code.StartsWith("V") && v.EndDate >= currentTime)
-                {
-                    if (int.TryParse(v.Code.Substring(1), out int number))
-                    {
-                        activeVoucherNumbers.Add(number);
-                    }
-                }
-            }
+            string voucherCode = "V-" + Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
 
-            // Tìm số nhỏ nhất chưa được sử dụng trong danh sách active
-            int newNumber = 1;
-            while (activeVoucherNumbers.Contains(newNumber))
-            {
-                newNumber++;
-            }
-            return "V" + newNumber.ToString("D4");
+            return voucherCode;
         }
     }
 }

@@ -4,7 +4,6 @@
     ViewData["Title"] = "Create Voucher";
 }
 
-<!-- CSS tùy chỉnh để giới hạn kích thước của card và các ô input -->
 <style>
     .form-card {
         max-width: 500px;
@@ -18,7 +17,7 @@
 
 <div class="container mt-5">
     <div class="card form-card shadow">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-dark text-white">
             <h2 class="mb-0">Create Voucher</h2>
         </div>
         <div class="card-body">
@@ -62,7 +61,6 @@
                     </div>
                 </div>
 
-                <!-- Phần button với khoảng cách và căn giữa -->
                 <div class="form-group text-center mt-4">
                     <input type="submit" value="Create" class="btn btn-success" />
                     <a asp-action="Index" class="btn btn-secondary ml-2">Back to List</a>

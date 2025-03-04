@@ -63,7 +63,6 @@ namespace PresentationLayer.Controllers
             ModelState.Remove("UpdatedAt");
             ModelState.Remove("DeletedAt");
 
-            // Khởi tạo các giá trị tự động
             voucher.Id = Guid.NewGuid().ToString();
             voucher.DeletedAt = null;
 

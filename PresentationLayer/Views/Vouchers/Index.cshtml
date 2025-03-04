@@ -6,7 +6,7 @@
 
 <div class="container mt-5">
     <div class="card shadow">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-dark text-white">
             <h2 class="mb-0">Voucher List</h2>
         </div>
         <div class="card-body">
@@ -26,8 +26,6 @@
                             <th>Amount</th>
                             <th>Start Date</th>
                             <th>End Date</th>
-                            <th>Created At</th>
-                            <th>Updated At</th>
                             <th style="width: 220px;">Actions</th>
                         </tr>
                     </thead>
@@ -42,8 +40,6 @@
                                 <td>@item.Amount</td>
                                 <td>@item.StartDate.ToString("dd/MM/yyyy")</td>
                                 <td>@item.EndDate.ToString("dd/MM/yyyy")</td>
-                                <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
-                                <td>@item.UpdatedAt.ToString("dd/MM/yyyy")</td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-info btn-sm">
