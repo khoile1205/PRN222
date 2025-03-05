@@ -6,7 +6,7 @@ namespace DataLayer.Entities
 {
     public class BeverageDetail : BaseEntity
     {
-        public string BeverageId { get; set; }
+        public string BeverageId { get; set; } 
         public string SizeId { get; set; }
         public decimal Price { get; set; }
 

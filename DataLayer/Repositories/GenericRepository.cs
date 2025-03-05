@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DataLayer.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _context;
         internal DbSet<T> _dbSet;
@@ -94,6 +94,7 @@ namespace DataLayer.Repositories
         {
             try
             {
+                // entity.DeletedAt = DateTime.Now;
                 _dbSet.Attach(entity);
                 _context.Entry(entity).State = EntityState.Modified;
                 await _context.SaveChangesAsync();

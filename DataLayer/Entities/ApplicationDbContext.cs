@@ -28,83 +28,9 @@ namespace DataLayer.Entities
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Shift>().HasData(
-                new Shift
-                {
-                    ShiftCode = Enums.ShiftCode.Morning,
-                    ShiftType = Enums.ShiftType.PartTime,
-                    Description = "Morning Part-time Shift",
-                    StartTime = new TimeSpan(7, 0, 0),
-                    EndTime = new TimeSpan(12, 0, 0)
-                },
-                new Shift
-                {
-                    ShiftCode = Enums.ShiftCode.Afternoon,
-                    ShiftType = Enums.ShiftType.PartTime,
-                    Description = "Afternoon Part-time Shift",
-                    StartTime = new TimeSpan(12, 0, 0),
-                    EndTime = new TimeSpan(17, 0, 0)
-                },
-                new Shift
-                {
-                    ShiftCode = Enums.ShiftCode.Evening,
-                    ShiftType = Enums.ShiftType.PartTime,
-                    Description = "Evening Part-time Shift",
-                    StartTime = new TimeSpan(17, 0, 0),
-                    EndTime = new TimeSpan(22, 0, 0)
-                },
-                new Shift
-                {
-                    ShiftCode = Enums.ShiftCode.Morning,
-                    ShiftType = Enums.ShiftType.FullTime,
-                    Description = "Morning Full-time Shift",
-                    StartTime = new TimeSpan(7, 0, 0),
-                    EndTime = new TimeSpan(14, 0, 0)
-                },
-                new Shift
-                {
-                    ShiftCode = Enums.ShiftCode.Afternoon,
-                    ShiftType = Enums.ShiftType.FullTime,
-                    Description = "Afternoon Full-time Shift",
-                    StartTime = new TimeSpan(14, 0, 0),
-                    EndTime = new TimeSpan(22, 0, 0)
-                }
-            );
-
-            modelBuilder.Entity<BeverageSize>().HasData(
-                new BeverageSize
-                {
-                    SizeName = Enums.BeverageSize.S.ToString()
-                },
-                new BeverageSize
-                {
-                    SizeName = Enums.BeverageSize.M.ToString()
-                },
-                new BeverageSize
-                {
-                    SizeName = Enums.BeverageSize.L.ToString()
-                },
-                new BeverageSize
-                {
-                    SizeName = Enums.BeverageSize.XL.ToString()
-                }
-           );
-
             modelBuilder.Entity<Role>()
                 .Property(r => r.RoleName)
                 .HasConversion<string>();
-
-            modelBuilder.Entity<Role>()
-                .HasData(
-                new Role
-                {
-                    RoleName = RoleEnum.Admin
-                },
-                new Role
-                {
-                    RoleName = RoleEnum.Staff
-                }
-          );
 
             // 1-1 relation
             modelBuilder.Entity<Transaction>()
@@ -171,6 +97,76 @@ namespace DataLayer.Entities
                 .HasMany(i => i.InventoryUpdateHistory)
                 .WithOne(iuh => iuh.Inventory)
                 .HasForeignKey(i => i.InventoryId);
+        }
+
+        public void SeedData()
+        {
+            if (!Shifts.Any())
+            {
+                Shifts.AddRange(
+                    new Shift
+                    {
+                        ShiftCode = Enums.ShiftCode.Morning,
+                        ShiftType = Enums.ShiftType.PartTime,
+                        Description = "Morning Part-time Shift",
+                        StartTime = new TimeSpan(7, 0, 0),
+                        EndTime = new TimeSpan(12, 0, 0)
+                    },
+                    new Shift
+                    {
+                        ShiftCode = Enums.ShiftCode.Afternoon,
+                        ShiftType = Enums.ShiftType.PartTime,
+                        Description = "Afternoon Part-time Shift",
+                        StartTime = new TimeSpan(12, 0, 0),
+                        EndTime = new TimeSpan(17, 0, 0)
+                    },
+                    new Shift
+                    {
+                        ShiftCode = Enums.ShiftCode.Evening,
+                        ShiftType = Enums.ShiftType.PartTime,
+                        Description = "Evening Part-time Shift",
+                        StartTime = new TimeSpan(17, 0, 0),
+                        EndTime = new TimeSpan(22, 0, 0)
+                    },
+                    new Shift
+                    {
+                        ShiftCode = Enums.ShiftCode.Morning,
+                        ShiftType = Enums.ShiftType.FullTime,
+                        Description = "Morning Full-time Shift",
+                        StartTime = new TimeSpan(7, 0, 0),
+                        EndTime = new TimeSpan(14, 0, 0)
+                    },
+                    new Shift
+                    {
+                        ShiftCode = Enums.ShiftCode.Afternoon,
+                        ShiftType = Enums.ShiftType.FullTime,
+                        Description = "Afternoon Full-time Shift",
+                        StartTime = new TimeSpan(14, 0, 0),
+                        EndTime = new TimeSpan(22, 0, 0)
+                    }
+                );
+                SaveChanges();
+            }
+
+            if (!BeverageSizes.Any())
+            {
+                BeverageSizes.AddRange(
+                    new BeverageSize { SizeName = Enums.BeverageSize.S.ToString() },
+                    new BeverageSize { SizeName = Enums.BeverageSize.M.ToString() },
+                    new BeverageSize { SizeName = Enums.BeverageSize.L.ToString() },
+                    new BeverageSize { SizeName = Enums.BeverageSize.XL.ToString() }
+                );
+                SaveChanges();
+            }
+
+            if (!Roles.Any())
+            {
+                Roles.AddRange(
+                    new Role { RoleName = RoleEnum.Admin },
+                    new Role { RoleName = RoleEnum.Staff }
+                );
+                SaveChanges();
+            }
         }
     }
 }

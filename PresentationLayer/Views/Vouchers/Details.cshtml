@@ -1,0 +1,57 @@
+﻿@model DataLayer.Entities.Voucher
+
+@{
+    ViewData["Title"] = "Voucher Details";
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0">Voucher Details</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th style="width: 30%;">Code</th>
+                    <td>@Html.DisplayFor(model => model.Code)</td>
+                </tr>
+                <tr>
+                    <th>Percentage</th>
+                    <td>@Html.DisplayFor(model => model.Percentage)</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>@Html.DisplayFor(model => model.Description)</td>
+                </tr>
+                <tr>
+                    <th>Max Discount Amount</th>
+                    <td>@Html.DisplayFor(model => model.MaxDiscountAmount)</td>
+                </tr>
+                <tr>
+                    <th>Amount</th>
+                    <td>@Html.DisplayFor(model => model.Amount)</td>
+                </tr>
+                <tr>
+                    <th>Start Date</th>
+                    <td>@Html.DisplayFor(model => model.StartDate)</td>
+                </tr>
+                <tr>
+                    <th>End Date</th>
+                    <td>@Html.DisplayFor(model => model.EndDate)</td>
+                </tr>
+                <tr>
+                    <th>Created At</th>
+                    <td>@Html.DisplayFor(model => model.CreatedAt)</td>
+                </tr>
+                <tr>
+                    <th>Updated At</th>
+                    <td>@Html.DisplayFor(model => model.UpdatedAt)</td>
+                </tr>
+            </table>
+        </div>
+        <div class="card-footer text-center">
+            <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-info">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary ml-2">Back to List</a>
+        </div>
+    </div>
+</div>
