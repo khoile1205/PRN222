@@ -1,3 +1,32 @@
+INSERT INTO [CaffeShop].[dbo].[Users] (
+    [Id], [UserName], [Password], [PhoneNumber], [Email], [Avatar], [Name], 
+    [DateOfBirth], [Gender], [Position], [RoleId], [StartDate], 
+    [CreatedAt], [UpdatedAt], [DeletedAt]
+) 
+VALUES
+(1, 'admin01', '123456', '0987654321', 'admin01@example.com', 'avatar1.jpg', 'Admin User', 
+ '1985-05-10', 0, 'Manager', '494a415a-4c97-4191-afc4-8ff55bf402fd', '2023-01-01', GETDATE(), GETDATE(), NULL),
+
+(2, 'staff01', '123456', '0912345678', 'staff01@example.com', 'avatar2.jpg', 'Staff One', 
+ '1990-08-20', 1, 'Barista', '7ec32894-f95c-4588-962e-c0cf011dea09', '2023-02-15', GETDATE(), GETDATE(), NULL),
+
+(3, 'staff02', '123456', '0923456789', 'staff02@example.com', 'avatar3.jpg', 'Staff Two', 
+ '1992-11-30', 0, 'Cashier', '7ec32894-f95c-4588-962e-c0cf011dea09', '2023-03-10', GETDATE(), GETDATE(), NULL),
+
+(4, 'staff03', '123456', '0934567890', 'staff03@example.com', 'avatar4.jpg', 'Staff Three', 
+ '1995-06-25', 0, 'Waiter', '7ec32894-f95c-4588-962e-c0cf011dea09', '2023-04-05', GETDATE(), GETDATE(), NULL),
+
+(5, 'staff04', '123456', '0945678901', 'staff04@example.com', 'avatar5.jpg', 'Staff Four', 
+ '1998-12-15', 1, 'Chef', '7ec32894-f95c-4588-962e-c0cf011dea09', '2023-05-20', GETDATE(), GETDATE(), NULL),
+
+(6, 'staff05', '123456', '0956789012', 'staff05@example.com', 'avatar6.jpg', 'Staff Five', 
+ '2000-07-18', 0, 'Cleaner', '7ec32894-f95c-4588-962e-c0cf011dea09', '2023-06-10', GETDATE(), GETDATE(), NULL),
+
+(7, 'staff06', '123456', '0967890123', 'staff06@example.com', 'avatar7.jpg', 'Staff Six', 
+ '2001-09-22', 1, 'Receptionist', '7ec32894-f95c-4588-962e-c0cf011dea09', '2023-07-15', GETDATE(), GETDATE(), NULL);
+
+
+----------------------------------------------------------------------------------------------------
 INSERT INTO [CaffeShop].[dbo].[InventoryCategories] 
     ([Id], [CategoryName], [CreatedAt], [UpdatedAt], [DeletedAt])
 VALUES 
@@ -11,7 +40,7 @@ VALUES
     ('8', 'Cleaning Supplies', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
     ('9', 'Equipment Parts', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL),
     ('10', 'Miscellaneous', '2025-02-26 10:00:00', '2025-02-26 10:00:00', NULL);
-
+----------------------------------------------------------------------------------------------------
 INSERT INTO [CaffeShop].[dbo].[Inventories] 
     ([Id], [Name], [CategoryId], [Unit], [Description], [Quantity], [CreatedAt], [UpdatedAt], [DeletedAt])
 VALUES 

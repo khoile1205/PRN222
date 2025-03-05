@@ -14,6 +14,7 @@ using PresentationLayer.ViewModel;
 using BussinessLayer.Services.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 using Shared.Enums;
+using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
@@ -208,5 +209,21 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Index");
         }
 
+        public async Task<IActionResult> Profile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var user = await userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
     }
 }

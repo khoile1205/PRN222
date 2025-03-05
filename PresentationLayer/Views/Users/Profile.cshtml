@@ -1,0 +1,20 @@
+﻿@model DataLayer.Entities.User
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<h2>User Profile</h2>
+
+<div>
+    <img src="@Model.Avatar" alt="Avatar" width="150" height="150" class="rounded-circle" />
+    <h3>@Model.Name</h3>
+    <p><strong>Username:</strong> @Model.UserName</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+    <p><strong>Gender:</strong> @(Model.Gender == 0 ? "Male" : "Female")</p>
+    <p><strong>Position:</strong> @Model.Position</p>
+    <p><strong>Role:</strong> @Model.Role.RoleName</p>
+    <p><strong>Start Date:</strong> @Model.StartDate.ToShortDateString()</p>
+</div>
+
+<a asp-action="EditProfile" class="btn btn-primary">Edit Profile</a>
