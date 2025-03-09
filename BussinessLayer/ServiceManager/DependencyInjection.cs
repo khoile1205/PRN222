@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using BussinessLayer.Authentication;
+using AutoMapper;
 
 namespace BussinessLayer.ServiceManager
 {
@@ -43,6 +44,12 @@ namespace BussinessLayer.ServiceManager
             services.AddScoped<IRoleService, RoleService>();
             services.AddSingleton<IJwtService, JwtService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IBeverageService, BeverageService>();
+            services.AddScoped<IBeverageCategoryService, BeverageCategoryService>();
+            services.AddScoped<IBeverageSizeService, BeverageSizeService>();
+
+            services.AddAutoMapper(typeof(DependencyInjection));
+
 
             #endregion
 

@@ -3,7 +3,6 @@
     public class Beverage : BaseEntity
     {
         public string CategoryId { get; set; }
-        public string Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal Price { get; set; }
         public string Image { get; set; } = string.Empty;

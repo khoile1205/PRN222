@@ -1,4 +1,7 @@
-﻿using DataLayer.Entities;
+﻿using BussinessLayer.DTOs.Beverages;
+using BussinessLayer.Services.Abstraction;
+using DataLayer.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -6,22 +9,27 @@ using PresentationLayer.Models;
 
 namespace PresentationLayer.Controllers
 {
+
+    [Authorize]
     public class BeverageController : Controller
     {
+        private readonly IBeverageService _beverageService;
+        private readonly IBeverageCategoryService _beverageCategoryService;
+        private readonly IBeverageSizeService _beverageSizeService;
         private readonly ApplicationDbContext _context;
 
-        public BeverageController(ApplicationDbContext context)
+        public BeverageController(ApplicationDbContext context, IBeverageService beverageService, IBeverageCategoryService beverageCategoryService, IBeverageSizeService beverageSizeService)
         {
             _context = context;
+            _beverageService = beverageService;
+            _beverageCategoryService = beverageCategoryService;
+            _beverageSizeService = beverageSizeService;
         }
 
         // Index
         public async Task<IActionResult> Index()
         {
-            var beverages = await _context.Beverages
-                .Include(b => b.BeverageDetails)
-                    .ThenInclude(bd => bd.Size)
-                .Include(b => b.BeverageCategory)
+            var beverages = (await _beverageService.GetAllBeverages()).ToList()
                 .Select(b => new BeverageViewModel
                 {
                     Id = b.Id,
@@ -38,20 +46,21 @@ namespace PresentationLayer.Controllers
                     CreatedAt = b.CreatedAt,
                     UpdatedAt = b.UpdatedAt,
                     DeletedAt = b.DeletedAt
-                }).ToListAsync();
+                });
 
             return View(beverages);
         }
 
         // Create (GET)
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Categories = _context.BeverageCategories
-                                         .Select(c => new { Id = c.Id, CategoryName = c.CategoryName })
-                                         .ToList();
 
-            ViewBag.Sizes = _context.BeverageSizes
-                                    .Select(s => new { Id = s.Id, Size = s.SizeName })
+            ViewBag.Categories = (await _beverageCategoryService.GetAllBeverageCategories())
+                                        .Select(c => new { c.Id, c.CategoryName })
+                                        .ToList();
+
+            ViewBag.Sizes = (await _beverageSizeService.GetAllBeverageSize())
+                                    .Select(s => new { s.Id, Size = s.SizeName })
                                     .ToList();
 
             return View();
@@ -60,49 +69,47 @@ namespace PresentationLayer.Controllers
         // Create (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(BeverageViewModel viewModel)
+        public async Task<IActionResult> Create(CreateBeverageDTO createBeverageDTO)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                ViewBag.Categories = _context.BeverageCategories
-                                             .Select(c => new { Id = c.Id, CategoryName = c.CategoryName })
-                                             .ToList();
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Categories = (await _beverageCategoryService.GetAllBeverageCategories())
+                                            .Select(c => new { c.Id, c.CategoryName })
+                                            .ToList();
 
-                ViewBag.Sizes = _context.BeverageSizes
-                                        .Select(s => new { Id = s.Id, Size = s.SizeName })
-                                        .ToList();
+                    ViewBag.Sizes = (await _beverageSizeService.GetAllBeverageSize())
+                                            .Select(s => new { Id = s.Id, Size = s.SizeName })
+                                            .ToList();
 
-                return View(viewModel);
+                    return View(createBeverageDTO);
+                }
+
+                await _beverageService.CreateAsync(createBeverageDTO);
+
+                TempData["SuccessMessage"] = "Beverage created successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = $"{ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An unexpected error occurred while creating the beverage.";
             }
 
-            var beverageId = string.IsNullOrEmpty(viewModel.Id) ? Guid.NewGuid().ToString() : viewModel.Id;
+            // Reload ViewBag data in case of error
+            ViewBag.Categories = (await _beverageCategoryService.GetAllBeverageCategories())
+                                    .Select(c => new { c.Id, c.CategoryName })
+                                    .ToList();
 
-            var beverage = new DataLayer.Entities.Beverage
-            {
-                Id = beverageId,
-                Name = viewModel.Name,
-                CategoryId = viewModel.CategoryId,
-                Image = viewModel.ImageUrl,
-                Description = viewModel.Description,
-                CreatedAt = DateTime.Now
-            };
+            ViewBag.Sizes = (await _beverageSizeService.GetAllBeverageSize())
+                                    .Select(s => new { Id = s.Id, Size = s.SizeName })
+                                    .ToList();
 
-            _context.Beverages.Add(beverage);
-            await _context.SaveChangesAsync();
-
-            var beverageDetail = new BeverageDetail
-            {
-                Id = Guid.NewGuid().ToString(),
-                BeverageId = beverageId,
-                SizeId = viewModel.SizeId,
-                Price = viewModel.Price,
-                CreatedAt = DateTime.Now
-            };
-
-            _context.BeverageDetails.Add(beverageDetail);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Index");
+            return View(createBeverageDTO);
         }
 
 
@@ -138,92 +145,54 @@ namespace PresentationLayer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, BeverageViewModel viewModel)
         {
-            Console.WriteLine($"Editing Beverage ID: {id}");
-
-            if (id != viewModel.Id)
+            try
             {
-                Console.WriteLine("ID Mismatch");
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid)
-            {
-                ModelState.Remove("CategoryId");
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                foreach (var error in errors)
+                var updateDto = new UpdateBeverageDTO
                 {
-                    Console.WriteLine($"Validation Error: {error}");
-                }
-                return View(viewModel);
-            }
-
-            var beverage = await _context.Beverages.FindAsync(id);
-            if (beverage == null)
-            {
-                Console.WriteLine("Beverage not found");
-                return NotFound();
-            }
-
-            beverage.Name = viewModel.Name;
-            beverage.Image = viewModel.ImageUrl;
-            beverage.Description = viewModel.Description;
-            beverage.UpdatedAt = DateTime.Now;
-
-            _context.Beverages.Update(beverage);
-
-            var beverageDetail = await _context.BeverageDetails.FirstOrDefaultAsync(bd => bd.BeverageId == id);
-            if (beverageDetail == null)
-            {
-                Console.WriteLine("BeverageDetail not found, creating a new one...");
-                beverageDetail = new BeverageDetail
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    BeverageId = id,
-                    SizeId = viewModel.SizeId ?? string.Empty,
-                    Price = viewModel.Price,
-                    CreatedAt = DateTime.Now
+                    Id = id,
+                    Name = viewModel.Name,
+                    ImageUrl = viewModel.ImageUrl ?? string.Empty,
+                    Description = viewModel.Description,
+                    SizeId = viewModel.SizeId,
+                    Price = viewModel.Price
                 };
 
-                _context.BeverageDetails.Add(beverageDetail);
+                await _beverageService.UpdateBeverage(updateDto);
+                TempData["SuccessMessage"] = "Beverage updated successfully!";
+                return RedirectToAction(nameof(Index));
             }
-            else
+            catch (Exception ex)
             {
-                beverageDetail.SizeId = viewModel.SizeId ?? string.Empty;
-                beverageDetail.Price = viewModel.Price;
-                beverageDetail.UpdatedAt = DateTime.Now;
-
-                _context.BeverageDetails.Update(beverageDetail);
+                TempData["ErrorMessage"] = ex.Message;
             }
 
-            await _context.SaveChangesAsync();
-
-            Console.WriteLine("Update successful");
-            return RedirectToAction(nameof(Index));
+            return View(viewModel);
         }
 
-        // Delete (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
-            var beverageDetails = _context.BeverageDetails.Where(bd => bd.BeverageId == id);
-            _context.BeverageDetails.RemoveRange(beverageDetails);
-
-            var beverage = await _context.Beverages.FindAsync(id);
-            if (beverage != null)
+            try
             {
-                _context.Beverages.Remove(beverage);
-                await _context.SaveChangesAsync();
+                var result = await _beverageService.DeleteBeverage(id);
+                if (!result)
+                {
+                    TempData["ErrorMessage"] = "Failed to delete the beverage.";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "Beverage deleted successfully.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while deleting the beverage.";
             }
 
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool BeverageExists(string id)
-        {
-            return _context.Beverages.Any(b => b.Id == id);
         }
     }
 }
