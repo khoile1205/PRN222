@@ -43,11 +43,12 @@ namespace BussinessLayer.ServiceManager
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddSingleton<IJwtService, JwtService>();
-            services.AddScoped<IAuthService, AuthService>();           
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IBeverageService, BeverageService>();
             services.AddScoped<IBeverageCategoryService, BeverageCategoryService>();
             services.AddScoped<IBeverageSizeService, BeverageSizeService>();
             services.AddScoped<IVoucherService, VoucherService>();
+            services.AddScoped<IRevenueService, RevenueService>();
 
             services.AddAutoMapper(typeof(DependencyInjection));
 
