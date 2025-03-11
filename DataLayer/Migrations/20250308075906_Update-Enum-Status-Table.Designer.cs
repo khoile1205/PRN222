@@ -4,6 +4,7 @@ using DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250308075906_Update-Enum-Status-Table")]
+    partial class UpdateEnumStatusTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,9 +347,8 @@ namespace DataLayer.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Area")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Area")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -370,10 +372,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tables", t =>
-                        {
-                            t.HasCheckConstraint("CHK_Status", "Status IN ('InUse', 'Available')");
-                        });
+                    b.ToTable("Tables");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.TableBeverage", b =>
@@ -450,9 +449,8 @@ namespace DataLayer.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PaymentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -465,6 +463,7 @@ namespace DataLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VoucherId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -474,10 +473,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("VoucherId");
 
-                    b.ToTable("Transactions", t =>
-                        {
-                            t.HasCheckConstraint("CHK_PaymentType", "PaymentType IN ('Cashing', 'Card')");
-                        });
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.User", b =>
@@ -695,7 +691,9 @@ namespace DataLayer.Migrations
 
                     b.HasOne("DataLayer.Entities.Voucher", "Voucher")
                         .WithMany("Transactions")
-                        .HasForeignKey("VoucherId");
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("TableDetail");
 

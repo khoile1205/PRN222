@@ -1,0 +1,241 @@
+@model IEnumerable<BussinessLayer.DTOs.Revenues.RevenueDTO>
+@using Shared.Enums
+@{
+    ViewData["Title"] = "Revenue Analysis";
+    var selectedRangeType = ViewBag.RangeType;
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>Revenue Analysis</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form id="dateRangeForm" method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="rangeType" class="form-label">Range Type</label>
+                            <select id="rangeType" name="rangeType" class="form-control">
+                                <option value="Day"
+                                        selected="@(selectedRangeType == RevenueRangeTypeEnum.Day ? "selected" : null)">
+                                    Day
+                                </option>
+                                <option value="Week"
+                                        selected="@(selectedRangeType == RevenueRangeTypeEnum.Week ? "selected" : null)">
+                                    Week
+                                </option>
+                                <option value="Month"
+                                        selected="@(selectedRangeType == RevenueRangeTypeEnum.Month ? "selected" : null)">
+                                    Month
+                                </option>
+                                <option value="Quarter"
+                                        selected="@(selectedRangeType == RevenueRangeTypeEnum.Quarter ? "selected" : null)">
+                                    Quarter
+                                </option>
+                                <option value="Year"
+                                        selected="@(selectedRangeType == RevenueRangeTypeEnum.Year ? "selected" : null)">
+                                    Year
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="startTime" class="form-label">Start Date</label>
+                            <input type="date" id="startTime" name="startTime" class="form-control"
+                                   value="@(ViewBag.StartTime != null ? ((DateTime)ViewBag.StartTime).ToString("yyyy-MM-dd") : null)">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="endTime" class="form-label">End Date</label>
+                            <input type="date" id="endTime" name="endTime" class="form-control"
+                                   value="@(ViewBag.EndTime != null ? ((DateTime)ViewBag.EndTime).ToString("yyyy-MM-dd") : null)">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary mb-3">Apply Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Revenue Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Revenue Data</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var revenue in Model)
+                                {
+                                    <tr>
+                                        <td>@revenue.Label</td>
+                                        <td>@revenue.Revenue.ToString("C")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function initializeChart() {
+            const labels = @Html.Raw(Json.Serialize(Model.Select(r => r.Label).ToArray()));
+            const revenues = @Html.Raw(Json.Serialize(Model.Select(r => r.Revenue).ToArray()));
+
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(213, 0, 249, 0.5)');
+            gradient.addColorStop(0.5, 'rgba(224, 64, 251, 0.25)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue',
+                        data: revenues,
+                        borderColor: '#9C27B0',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBorderWidth: 2,
+                        pointBorderColor: 'white',
+                        pointBackgroundColor: '#9C27B0',
+                        pointHoverRadius: 7,
+                        pointHoverBackgroundColor: '#AB47BC',
+                        pointHoverBorderColor: 'white',
+                        pointHoverBorderWidth: 2,
+                        borderCapStyle: 'round',
+                        borderJoinStyle: 'round'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(150, 150, 150, 0.1)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#555',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(150, 150, 150, 0.1)', 
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#333',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                stepSize: 50000,
+                                callback: function (value) {
+                                    return new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND',
+                                        minimumFractionDigits: 0
+                                    }).format(value);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            backgroundColor: 'rgba(50, 50, 50, 0.9)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            titleFont: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 14
+                            },
+                            callbacks: {
+                                label: function (context) {
+                                    return 'Doanh thu: ' + new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND'
+                                    }).format(context.raw);
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function validateDateRange(startTimeInput, endTimeInput) {
+            const startTime = new Date(startTimeInput.value);
+            const endTime = new Date(endTimeInput.value);
+
+            if (startTime > endTime) {
+                toastr.error("Start date cannot be after end date.", "Validation Error");
+                return false;
+            }
+            return true;
+        }
+
+        function initializeDateValidation() {
+            const startTimeInput = document.getElementById("startTime");
+            const endTimeInput = document.getElementById("endTime");
+
+            const form = document.querySelector("form");
+            if (form) {
+                form.addEventListener("submit", function (event) {
+                    if (!validateDateRange(startTimeInput, endTimeInput)) {
+                        event.preventDefault();
+                    }
+                });
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeChart();
+            initializeDateValidation();
+        });
+    </script>
+}
