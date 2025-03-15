@@ -2,6 +2,7 @@
 using BussinessLayer.Services.Abstraction;
 using DataLayer.Entities;
 using DataLayer.Repositories.Abstraction;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,5 +74,10 @@ namespace BussinessLayer.Services
 
             return voucherCode;
         }
-    }
+		public async Task<Voucher?> GetVoucherByCodeAsync(string code)
+		{
+			return await _voucherRepository.GetAsync(v => v.Code == code);
+		}
+
+	}
 }

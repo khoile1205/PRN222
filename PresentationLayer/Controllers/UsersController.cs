@@ -17,7 +17,7 @@ using Shared.Enums;
 
 namespace PresentationLayer.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserService userService;

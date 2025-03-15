@@ -47,10 +47,15 @@ namespace BussinessLayer.ServiceManager
             services.AddScoped<IBeverageService, BeverageService>();
             services.AddScoped<IBeverageCategoryService, BeverageCategoryService>();
             services.AddScoped<IBeverageSizeService, BeverageSizeService>();
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<ITableService, TableService>();
+			services.AddScoped<ITableDetailService, TableDetailService>();
+			services.AddScoped<IBeverageDetailService, BeverageDetailService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IRevenueService, RevenueService>();
 
-            services.AddAutoMapper(typeof(DependencyInjection));
+			services.AddAutoMapper(typeof(DependencyInjection));
+
 
             #endregion
 

@@ -1,0 +1,36 @@
+﻿@model IEnumerable<DataLayer.Entities.Transaction>
+
+<h1 class="fw-bold">
+    <i class="bi bi-receipt"></i> Transactions
+</h1>
+<a class="btn btn-success" asp-action="Create">Back To Order</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Table</th>
+            <th>Beverage</th>
+            <th>Price</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.TableDetail.Table.TableName</td>
+                <td>
+                    @string.Join(", ", item.TableDetail.TableBeverages
+                             .Where(tb => tb.BeverageDetail?.Size != null)
+                             .Select(tb => $"{tb.BeverageDetail.Beverage.Name} ({tb.BeverageDetail.Size.SizeName})"))
+
+                </td>
+                <td>@item.Price VND</td>
+                <td>@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">View</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

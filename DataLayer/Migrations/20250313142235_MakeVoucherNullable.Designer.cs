@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250308082058_MakeVoucherNullable")]
+    [Migration("20250313142235_MakeVoucherNullable")]
     partial class MakeVoucherNullable
     {
         /// <inheritdoc />
