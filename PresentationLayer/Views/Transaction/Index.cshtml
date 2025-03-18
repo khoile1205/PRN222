@@ -3,7 +3,19 @@
 <h1 class="fw-bold">
     <i class="bi bi-receipt"></i> Transactions
 </h1>
-<a class="btn btn-success" asp-action="Create">Back To Order</a>
+
+<form method="get" asp-action="Index" class="mb-3 mt-3 d-flex">
+    <label for="startDate" class="form-label me-2">Start Date:</label>
+    <input type="date" id="startDate" name="startDate" class="form-control w-auto me-3" value="@ViewBag.StartDate">
+
+    <label for="endDate" class="form-label me-2">End Date:</label>
+    <input type="date" id="endDate" name="endDate" class="form-control w-auto me-3" value="@ViewBag.EndDate">
+
+    <button type="submit" class="btn btn-success">
+        <i class="bi bi-search"></i>
+    </button>
+</form>
+
 <table class="table">
     <thead>
         <tr>
@@ -34,3 +46,18 @@
         }
     </tbody>
 </table>
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        @for (int i = 1; i <= (int)ViewData["TotalPages"]; i++)
+        {
+            <li class="page-item @(i == (int)ViewData["CurrentPage"] ? "active" : "")">
+                <a class="page-link" href="@Url.Action("Index", new { startDate = ViewBag.StartDate, endDate = ViewBag.EndDate, page = i })">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+<a asp-action="Create" class="btn btn-warning">
+    <i class="fa fa-arrow-left"></i> Back To Order
+</a>

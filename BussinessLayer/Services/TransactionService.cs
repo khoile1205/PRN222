@@ -32,7 +32,7 @@ namespace BussinessLayer.Services
             return true;
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync(DateTime? startDate, DateTime? endDate, int skip, int take)
         {
             var transactions = await _transactionRepository.GetAllAsync(
                 includes: u => u.Include(u => u.TableDetail)
@@ -44,8 +44,19 @@ namespace BussinessLayer.Services
                                 .ThenInclude(tb => tb.BeverageDetail)
                                     .ThenInclude(bd => bd.Size)
             );
-            return transactions.OrderByDescending(t => t.CreatedAt);
+
+            if (startDate.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt.Date >= startDate.Value.Date);
+            }
+            if (endDate.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt.Date <= endDate.Value.Date);
+            }
+
+            return transactions.OrderByDescending(t => t.CreatedAt).Skip(skip).Take(take);
         }
+
 
 
         public async Task<Transaction?> GetTransactionByIdAsync(string id)

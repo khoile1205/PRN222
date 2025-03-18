@@ -2,10 +2,13 @@
 using BussinessLayer.Services.Abstraction;
 using DataLayer.Entities;
 using DataLayer.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PresentationLayer.Controllers
 {
+	[Authorize]
     public class TransactionController : Controller
     {
         private readonly ITransactionService _transactionService;
@@ -32,11 +35,22 @@ namespace PresentationLayer.Controllers
 			_voucherService = voucherService;
 		}
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int page = 1, int pageSize = 10)
         {
-            var transactions = await _transactionService.GetAllTransactionsAsync();
-            return View(transactions);
+            var allTransactions = await _transactionService.GetAllTransactionsAsync(startDate, endDate, 0, int.MaxValue);
+            int totalRecords = allTransactions.Count();
+
+            var paginatedData = await _transactionService.GetAllTransactionsAsync(startDate, endDate, (page - 1) * pageSize, pageSize);
+
+            ViewData["TotalPages"] = (int)Math.Ceiling((double)totalRecords / pageSize);
+            ViewData["CurrentPage"] = page;
+            ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
+            ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
+
+            return View(paginatedData);
         }
+
+
 
         public async Task<IActionResult> Create()
         {
@@ -51,11 +65,23 @@ namespace PresentationLayer.Controllers
 				.ToList();
 
 			ViewBag.Tables = await _tableService.GetAllTablesAsync();
+			ViewBag.PaymentTypes = new SelectList(
+				Enum.GetValues(typeof(PaymentType))
+					.Cast<PaymentType>()
+					.Select(pt => new { Id = (int)pt, Name = pt.ToString() }),
+				"Id", "Name"
+			);
+
+
 			return View();
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Create(string TableId, string? VoucherCode, decimal finalPrice, List<TableBeverage> Items)
+		public async Task<IActionResult> Create(string TableId, 
+			string? VoucherCode, 
+			decimal finalPrice, 
+			List<TableBeverage> Items,
+			PaymentType PaymentType)
 		{
 			if (Items == null || Items.Count == 0)
 			{
@@ -120,10 +146,12 @@ namespace PresentationLayer.Controllers
 				TableDetailId = tableDetail.Id,
 				Price = finalPrice,
 				VoucherId = voucher?.Id,
-				PaymentType = PaymentType.Cashing
+				PaymentType = PaymentType
 			};
 
 			await _transactionService.CreateTransactionAsync(transaction);
+			TempData["SuccessMessage"] = "Order successfully!";
+
 
 			return RedirectToAction("Index");
 		}

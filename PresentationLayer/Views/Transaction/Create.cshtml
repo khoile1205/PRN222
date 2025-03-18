@@ -1,4 +1,5 @@
-﻿
+﻿@model DataLayer.Entities.Transaction
+
 <form id="orderForm" method="post" action="/Transaction/Create">
 	<input type="hidden" id="tableDetailId" name="TableDetailId">
 
@@ -82,10 +83,15 @@
 				<p><strong>Discount:</strong> <span id="discountAmount">0</span> VND</p>
 				<p><strong>Total amount:</strong> <span id="finalPrice">0</span> VND</p>
 
+				<div class="mb-3">
+					<label for="paymentType" class="form-label fw-bold">Payment Method:</label>
+					<select asp-for="PaymentType" class="form-select" asp-items="ViewBag.PaymentTypes"></select>
+				</div>
+
 
 				<div id="hidden-inputs"></div>
 
-				<button type="submit" class="btn btn-custom w-100" onclick="prepareOrder()">Order</button>
+				<button type="submit" class="btn btn-custom w-100 mt-3" onclick="prepareOrder()">Order</button>
 			</div>
 		</div>
 	</div>
@@ -119,6 +125,7 @@
 	function renderOrderList() {
 		const orderListElement = document.getElementById('order-list');
 		const grandTotalElement = document.getElementById('grand-total');
+		const finalPriceElement = document.getElementById('finalPrice');
 		let grandTotal = 0;
 
 		orderListElement.innerHTML = '';
@@ -141,6 +148,7 @@
 		});
 
 		grandTotalElement.innerText = `${grandTotal.toLocaleString()} VND`;
+		finalPriceElement.innerText = `${grandTotal.toLocaleString()} VND`;
 	}
 
 	function prepareOrder() {
@@ -157,6 +165,11 @@
 		let finalPriceText = document.getElementById('finalPrice').innerText;
 
 		let finalPrice = parseFloat(finalPriceText.replace(/[^0-9,]+/g, '').replace(',', '.'));
+
+		if (isNaN(finalPrice) || finalPrice <= 0) {
+			finalPrice = orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+		}
+
 		hiddenInputsContainer.innerHTML += `
 			<input type="hidden" name="finalPrice" value="${finalPrice}">
 			`;
