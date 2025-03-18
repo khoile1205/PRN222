@@ -20,3 +20,24 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.btn-custom {
+    background-color: #966715 !important;
+    border-color: #966715 !important;
+    color: white !important;
+}
+
+    .btn-custom:hover {
+        background-color: #7a500f !important;
+    }
+
+
+.card-img-top {
+    height: 220px;
+    object-fit: cover;
+}
+
+.card-body {
+    background-color: #f0e2d1 !important;
+}
+

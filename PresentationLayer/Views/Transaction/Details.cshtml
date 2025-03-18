@@ -1,0 +1,46 @@
+﻿@model DataLayer.Entities.Transaction
+
+<h3 class="fw-bold">
+    <i class="bi bi-receipt"></i> Transactions Details
+</h3>
+<table class="table">
+    <tr><th>Table</th><td>@(Model.TableDetail?.Table?.TableName ?? "-")</td></tr>
+    <tr><th>Price</th><td>@Model.Price VND</td></tr>
+    <tr><th>Voucher</th><td>@(Model.Voucher?.Code ?? "No Voucher")</td></tr>
+    <tr><th>Payment Type</th><td>@Model.PaymentType</td></tr>
+    <tr><th>Created At</th><td>@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td></tr>
+</table>
+
+<h3 class="fw-bold">
+    <i class="bi bi-cup-straw"></i> Transactions Details
+</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.TableDetail?.TableBeverages?.Any() == true)
+        {
+            @foreach (var tb in Model.TableDetail.TableBeverages)
+            {
+                <tr>
+                    <td>@(tb.BeverageDetail?.Beverage?.Name ?? "-")</td>
+                    <td>@(tb.BeverageDetail?.Size?.SizeName ?? "-")</td>
+                    <td>@tb.Quantity</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="3" class="text-center text-muted">No beverages in this transaction</td></tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-warning">
+    <i class="fa fa-arrow-left"></i> Back
+</a>
