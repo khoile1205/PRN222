@@ -171,27 +171,6 @@ namespace PresentationLayer.Controllers
 			ViewBag.Tables = await _tableService.GetAllTablesAsync();
 		}
 
-
-		[HttpGet]
-		public async Task<IActionResult> Check(string code)
-		{
-			var voucher = await _voucherService.GetVoucherByCodeAsync(code);
-
-			if (voucher == null || voucher.EndDate < DateTime.Today)
-			{
-				return NotFound();
-			}
-
-			return Json(new
-			{
-				isValid = true,
-				percentage = voucher.Percentage,
-				maxDiscountAmount = voucher.MaxDiscountAmount
-			});
-		}
-
-
-
 		public async Task<IActionResult> Details(string id)
         {
             var transaction = await _transactionService.GetTransactionByIdAsync(id);

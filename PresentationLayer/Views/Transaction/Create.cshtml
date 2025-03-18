@@ -99,137 +99,155 @@
 
 
 <script>
-	let orderList = [];
+    let orderList = [];
+    let appliedVoucher = null;
 
-	function addToOrder(id, name, price) {
-		const existingItem = orderList.find(item => item.id === id);
-		if (existingItem) {
-			existingItem.quantity++;
-		} else {
-			orderList.push({ id, name, price: parseFloat(price), quantity: 1 });
-		}
-		renderOrderList();
-	}
+    function getListOrderPrice() {
+        return orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    }
 
-	function updateQuantity(id, change) {
-		const item = orderList.find(item => item.id === id);
-		if (item) {
-			item.quantity += change;
-			if (item.quantity <= 0) {
-				orderList = orderList.filter(i => i.id !== id);
-			}
-			renderOrderList();
-		}
-	}
+    function addToOrder(id, name, price) {
+        const existingItem = orderList.find(item => item.id === id);
+        if (existingItem) {
+            existingItem.quantity++;
+        } else {
+            orderList.push({ id, name, price: parseFloat(price), quantity: 1 });
+        }
+        renderOrderList();
+        updateDiscountDisplay()
+    }
 
-	function renderOrderList() {
-		const orderListElement = document.getElementById('order-list');
-		const grandTotalElement = document.getElementById('grand-total');
-		const finalPriceElement = document.getElementById('finalPrice');
-		let grandTotal = 0;
+    function updateQuantity(id, change) {
+        const item = orderList.find(item => item.id === id);
+        if (item) {
+            item.quantity += change;
+            if (item.quantity <= 0) {
+                orderList = orderList.filter(i => i.id !== id);
+            }
+            renderOrderList();
+            updateDiscountDisplay()
+        }
+    }
 
-		orderListElement.innerHTML = '';
-		orderList.forEach(item => {
-			const itemTotal = item.price * item.quantity;
-			grandTotal += itemTotal;
+    function renderOrderList() {
+        const orderListElement = document.getElementById('order-list');
+        const grandTotalElement = document.getElementById('grand-total');
+        let grandTotal = 0;
 
-			orderListElement.innerHTML += `
-						<tr>
-							<td>${item.name}</td>
-							<td>
-								<button class="btn btn-sm btn-danger" type="button" onclick="updateQuantity('${item.id}', -1)">-</button>
-								${item.quantity}
-								<button class="btn btn-sm btn-success" type="button" onclick="updateQuantity('${item.id}', 1)">+</button>
-							</td>
-							<td>${item.price.toLocaleString()}</td>
-							<td>${itemTotal.toLocaleString()}</td>
-						</tr>
-					`;
-		});
+        orderListElement.innerHTML = '';
+        orderList.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            grandTotal += itemTotal;
 
-		grandTotalElement.innerText = `${grandTotal.toLocaleString()} VND`;
-		finalPriceElement.innerText = `${grandTotal.toLocaleString()} VND`;
-	}
+            orderListElement.innerHTML += `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" type="button" onclick="updateQuantity('${item.id}', -1)">-</button>
+                                        ${item.quantity}
+                                        <button class="btn btn-sm btn-success" type="button" onclick="updateQuantity('${item.id}', 1)">+</button>
+                                    </td>
+                                    <td>${item.price.toLocaleString()}</td>
+                                    <td>${itemTotal.toLocaleString()}</td>
+                                </tr>
+                            `;
+        });
+        grandTotalElement.innerText = `${grandTotal.toLocaleString()} VND`;
+        calculateTotalPrice()
+    }
 
-	function prepareOrder() {
-		const hiddenInputsContainer = document.getElementById('hidden-inputs');
-		hiddenInputsContainer.innerHTML = '';
+    function calculateTotalPrice() {
+        let totalPrice = orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let discountAmount = 0;
 
-		orderList.forEach((item, index) => {
-			hiddenInputsContainer.innerHTML += `
-						<input type="hidden" name="Items[${index}].BeverageDetailId" value="${item.id}">
-						<input type="hidden" name="Items[${index}].Quantity" value="${item.quantity}">
-					`;
-		});
+        if (appliedVoucher) {
+            discountAmount = Math.min((totalPrice * appliedVoucher.percentage) / 100, appliedVoucher.maxDiscountAmount);
+        }
 
-		let finalPriceText = document.getElementById('finalPrice').innerText;
+        document.getElementById("finalPrice").innerText = (totalPrice - discountAmount).toLocaleString();
+    }
 
-		let finalPrice = parseFloat(finalPriceText.replace(/[^0-9,]+/g, '').replace(',', '.'));
+    function updateDiscountDisplay() {
+        if (appliedVoucher) {
+            let discountAmount = getDiscountAmount();
+            document.getElementById("discountAmount").innerText = discountAmount.toLocaleString();
+        }
+    }
 
-		if (isNaN(finalPrice) || finalPrice <= 0) {
-			finalPrice = orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-		}
+    function prepareOrder() {
+        const hiddenInputsContainer = document.getElementById('hidden-inputs');
+        hiddenInputsContainer.innerHTML = '';
 
-		hiddenInputsContainer.innerHTML += `
-			<input type="hidden" name="finalPrice" value="${finalPrice}">
-			`;
-	}
+        orderList.forEach((item, index) => {
+            hiddenInputsContainer.innerHTML += `
+                                <input type="hidden" name="Items[${index}].BeverageDetailId" value="${item.id}">
+                                <input type="hidden" name="Items[${index}].Quantity" value="${item.quantity}">
+                            `;
+        });
 
+        let finalPrice = getListOrderPrice() - getDiscountAmount();
+        hiddenInputsContainer.innerHTML += `
+                    <input type="hidden" name="finalPrice" value="${finalPrice}">
+                    `;
+    }
 
+    function getDiscountAmount() {
+        let totalPrice = getListOrderPrice();
+        let discountAmount = 0;
 
-	function applyVoucher() {
-		let voucherCodeInput = document.getElementById("voucherCode");
-		let voucherCode = document.getElementById("voucherCode").value.trim();
+        if (appliedVoucher) {
+            discountAmount = Math.min((totalPrice * appliedVoucher.percentage) / 100, appliedVoucher.maxDiscountAmount);
+        }
 
-		if (!voucherCode) {
-			alert("Please Enter Voucher Code");
-			return;
-		}
+        return discountAmount;
+    }
 
-		fetch(`/Transaction/Check?code=${voucherCode}`)
-			.then(response => {
-				if (!response.ok) {
-					throw new Error("Voucher is invalid or expired");
-				}
-				return response.json();
-			})
-			.then(data => {
-				let totalPrice = orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-				let discountAmount = (totalPrice * data.percentage) / 100;
+    function applyVoucher() {
+        let voucherCodeInput = document.getElementById("voucherCode");
+        let voucherCode = document.getElementById("voucherCode").value.trim();
 
-				if (discountAmount > data.maxDiscountAmount) {
-					discountAmount = data.maxDiscountAmount;
-				}
+        if (!voucherCode) {
+            alert("Please Enter Voucher Code");
+            return;
+        }
 
-				let finalPrice = totalPrice - discountAmount;
+        fetch(`/Vouchers/Check?code=${voucherCode}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Voucher is invalid or expired");
+                }
+                return response.json();
+            })
+            .then(data => {
+                let totalPrice = getListOrderPrice();
+                appliedVoucher = data;
+                let discountAmount = getDiscountAmount();
+                document.getElementById("discountAmount").innerText = discountAmount.toLocaleString();
+            })
+            .catch(error => {
+                alert(error.message);
+                voucherCodeInput.value = "";
+                let totalPrice = getListOrderPrice();
+                document.getElementById("discountAmount").innerText = "0";
+            })
+            .finally(() => {
+                calculateTotalPrice()
+            });
+    }
 
-				document.getElementById("discountAmount").innerText = discountAmount.toLocaleString() + " VND";
-				document.getElementById("finalPrice").innerText = finalPrice.toLocaleString() + " VND";
-			})
-			.catch(error => {
-				alert(error.message);
-				voucherCodeInput.value = "";
-				let totalPrice = orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-				document.getElementById("discountAmount").innerText = "0 VND";
-				document.getElementById("finalPrice").innerText = totalPrice.toLocaleString() + " VND";
-			});
-	}
+    function filterBeverages() {
+        let selectedCategory = document.getElementById("categoryFilter").value;
+        let searchText = document.getElementById("searchBeverage").value.toLowerCase();
+        let beverageItems = document.querySelectorAll(".beverage-item");
 
-	function filterBeverages() {
-		let selectedCategory = document.getElementById("categoryFilter").value;
-		let searchText = document.getElementById("searchBeverage").value.toLowerCase();
-		let beverageItems = document.querySelectorAll(".beverage-item");
+        beverageItems.forEach(item => {
+            let itemCategory = item.getAttribute("data-category");
+            let itemName = item.querySelector(".card-title").innerText.toLowerCase();
 
-		beverageItems.forEach(item => {
-			let itemCategory = item.getAttribute("data-category");
-			let itemName = item.querySelector(".card-title").innerText.toLowerCase();
+            let matchCategory = selectedCategory === "" || itemCategory === selectedCategory;
+            let matchSearch = searchText === "" || itemName.includes(searchText);
 
-			let matchCategory = selectedCategory === "" || itemCategory === selectedCategory;
-			let matchSearch = searchText === "" || itemName.includes(searchText);
-
-			item.style.display = matchCategory && matchSearch ? "block" : "none";
-		});
-	}
-
-
+            item.style.display = matchCategory && matchSearch ? "block" : "none";
+        });
+    }
 </script>
