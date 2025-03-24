@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PresentationLayer.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class VouchersController : Controller
     {
         private readonly IVoucherService _voucherService;

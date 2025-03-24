@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\BussinessLayer\Helper\HashPasswordHelper.cs" Link="HashPasswordHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.69.1" />
+  </ItemGroup>
+
 </Project>

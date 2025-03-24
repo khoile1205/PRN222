@@ -10,7 +10,7 @@ using PresentationLayer.Models;
 namespace PresentationLayer.Controllers
 {
 
-    [Authorize]
+    //[Authorize]
     public class BeverageController : Controller
     {
         private readonly IBeverageService _beverageService;

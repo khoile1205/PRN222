@@ -8,7 +8,6 @@ namespace DataLayer.Entities
         public DateTime ShiftDate { get; set; }
         public string ShiftId { get; set; } // Foreign Key to Shift
         public RequestStatus Status { get; set; }
-
         public virtual User? Staff { get; set; }
         public virtual Shift? Shift { get; set; }
     }

@@ -18,7 +18,7 @@ using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserService userService;
@@ -223,6 +223,55 @@ namespace PresentationLayer.Controllers
                 return NotFound();
             }
 
+            return View(user);
+        }
+
+        public async Task<IActionResult> EditProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var user = await userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+                                        .Cast<Gender>()
+                                        .Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name", (int)user.Gender);
+
+            return View(user);
+        }
+
+        public async Task<IActionResult> EditProfile([Bind("Id,UserName,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,StartDate")] User user)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null || userId != user.Id)
+            {
+                return Unauthorized();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    user.UpdatedAt = TimeHelper.GetVietnamTime();
+                    await userService.UpdateUser(user);
+
+                    TempData["SuccessMessage"] = "Profile updated successfully!";
+                    return RedirectToAction("Profile");
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    TempData["ErrorMessage"] = "Data has been changed, please try again!";
+                }
+            }
+            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+                                        .Cast<Gender>()
+                                        .Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name", (int)user.Gender);
             return View(user);
         }
     }
