@@ -24,6 +24,9 @@ namespace DataLayer.Entities
         public DbSet<TableBeverage> TableBeverages { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+            => optionsBuilder.UseSqlServer("Server=localhost;Database=CaffeShop;Trusted_Connection=SSPI;Encrypt=false;TrustServerCertificate=true");
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

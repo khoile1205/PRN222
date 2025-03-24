@@ -1,0 +1,27 @@
+﻿@model IEnumerable<DataLayer.Entities.ShiftStaff>
+
+@{
+    ViewData["Title"] = "My Shift Requests";
+}
+
+<h2>My Shift Requests</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Shift Date</th>
+            <th>Shift Type</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.ShiftDate.ToShortDateString()</td>
+                <td>@request.Shift.ShiftCode (@request.Shift.ShiftType)</td>
+                <td>@request.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>

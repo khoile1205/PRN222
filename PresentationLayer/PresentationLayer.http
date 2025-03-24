@@ -22,3 +22,11 @@ GET {{PresentationLayer_HostAddress}}/users/profile/{4
 GET {{PresentationLayer_HostAddress}}/users/editprofile/{4}
 
 ###
+
+GET {{PresentationLayer_HostAddress}}/auth/login/{id}
+
+###
+
+GET {{PresentationLayer_HostAddress}}/shift/index/{1}
+
+###

@@ -34,6 +34,8 @@ namespace BussinessLayer.ServiceManager
             services.AddScoped(typeof(IPaginationRepository<>), typeof(PaginationRepository<>));
             services.AddScoped<IInventoryRepository, InventoryRepository>();
             services.AddScoped<IInventoryCategoryRepository, InventoryCategoryRepository>();
+            services.AddScoped<IShiftRepository, ShiftRepository>();
+            services.AddScoped<IShiftStaffRepository, ShiftStaffRepository>();
             #endregion
 
             #region Services
@@ -50,8 +52,10 @@ namespace BussinessLayer.ServiceManager
 			services.AddScoped<IBeverageDetailService, BeverageDetailService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IRevenueService, RevenueService>();
+            services.AddScoped<IShiftService, ShiftService>();
+            services.AddScoped<IShiftStaffService, ShiftStaffService>();
 
-			services.AddAutoMapper(typeof(DependencyInjection));
+            services.AddAutoMapper(typeof(DependencyInjection));
 
 
             services.AddAutoMapper(typeof(DependencyInjection));
@@ -70,8 +74,7 @@ namespace BussinessLayer.ServiceManager
             }
 
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -82,7 +85,7 @@ namespace BussinessLayer.ServiceManager
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = issuer,
                         IssuerSigningKey = signingKey,
-                        ClockSkew = TimeSpan.Zero // Optional: Reduces token validity skew
+                        ClockSkew = TimeSpan.Zero
                     };
                 })
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -93,6 +96,7 @@ namespace BussinessLayer.ServiceManager
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
                     options.SlidingExpiration = true;
                 });
+
 
             services.AddAuthorization();
             #endregion

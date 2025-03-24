@@ -34,8 +34,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home"
-                               asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Inventory" asp-action="Index">Inventory</a>
@@ -43,7 +42,32 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="InventoryCategory" asp-action="Index">Inventory Category</a>
                         </li>
+
+                        <!-- Shifts Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="shiftsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Shifts
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="shiftsDropdown">
+                                <li><a class="dropdown-item" asp-controller="Shift" asp-action="Index">View Shifts</a></li>
+                                <li><a class="dropdown-item" asp-controller="Shift" asp-action="RequestShift">Request Shift</a></li>
+                                <li><a class="dropdown-item" asp-controller="Shift" asp-action="MyRequests">My Requests</a></li>
+                                <li><a class="dropdown-item" asp-controller="Shift" asp-action="ApproveRequests">Approve Requests</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- Profile Dropdown -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Profile
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="Profile">View Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="Users" asp-action="EditProfile">Edit Profile</a></li>
+                            </ul>
+                        </li>
                     </ul>
+
                     <ul class="navbar-nav align-items-center">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
