@@ -60,6 +60,17 @@ namespace DataLayer.Entities
                 .WithMany(t => t.TableDetails)
                 .HasForeignKey(td => td.TableId);
 
+            modelBuilder.Entity<Table>()
+              .Property(r => r.Status)
+              .HasConversion<string>();
+
+            modelBuilder.Entity<Table>()
+                .ToTable(t => t.HasCheckConstraint("CHK_Status", "Status IN ('InUse', 'Available')"));
+
+            modelBuilder.Entity<Table>()
+              .Property(r => r.Area)
+              .HasConversion<string>();
+
             modelBuilder.Entity<TableBeverage>()
                 .HasOne(tb => tb.TableDetail)
                 .WithMany(td => td.TableBeverages)
@@ -69,7 +80,15 @@ namespace DataLayer.Entities
             modelBuilder.Entity<Transaction>()
                .HasOne(t => t.Voucher)
                .WithMany(v => v.Transactions)
-               .HasForeignKey(t => t.VoucherId);
+               .HasForeignKey(t => t.VoucherId)
+               .IsRequired(false);
+
+            modelBuilder.Entity<Transaction>()
+             .Property(r => r.PaymentType)
+             .HasConversion<string>();
+
+            modelBuilder.Entity<Transaction>()
+               .ToTable(t => t.HasCheckConstraint("CHK_PaymentType", "PaymentType IN ('Cashing', 'Card')"));
 
             // Beverage relation
             modelBuilder.Entity<BeverageDetail>()

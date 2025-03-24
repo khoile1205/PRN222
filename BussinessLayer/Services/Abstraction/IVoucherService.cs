@@ -14,5 +14,6 @@ namespace BussinessLayer.Services.Abstraction
         public Task CreateVoucherAsync(Voucher voucher);
         public Task UpdateVoucherAsync(Voucher voucher);
         public Task DeleteVoucherAsync(string id);
-    }
+        public Task<Voucher?> GetVoucherByCodeAsync(string code);
+	}
 }

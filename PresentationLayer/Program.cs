@@ -11,6 +11,11 @@ var dependencyInjection = new DependencyInjection();
 dependencyInjection.ConfigureServices(builder.Services, builder.Configuration);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+	options.JsonSerializerOptions.PropertyNamingPolicy = null;
+});
+
 // Register DbContext with connection string
 builder.Services.AddDbContext<DataLayer.Entities.ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

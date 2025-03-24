@@ -4,6 +4,7 @@ using DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250308075906_Update-Enum-Status-Table")]
+    partial class UpdateEnumStatusTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,36 +147,6 @@ namespace DataLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("BeverageSizes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "a48053c8-7ae1-4b89-a77e-ce1712cc8fc3",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7642),
-                            SizeName = "S",
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7642)
-                        },
-                        new
-                        {
-                            Id = "cc5f922e-2baf-4f4a-b5a9-61bb89602403",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7653),
-                            SizeName = "M",
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7654)
-                        },
-                        new
-                        {
-                            Id = "56fb3734-3163-4a31-91ce-f13cf6603e7b",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7656),
-                            SizeName = "L",
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7656)
-                        },
-                        new
-                        {
-                            Id = "460d6706-37f6-4857-b1bd-ef191fcdc203",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7661),
-                            SizeName = "XL",
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7661)
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Inventory", b =>
@@ -295,22 +268,6 @@ namespace DataLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "494a415a-4c97-4191-afc4-8ff55bf402fd",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(8127),
-                            RoleName = "Admin",
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(8128)
-                        },
-                        new
-                        {
-                            Id = "7ec32894-f95c-4588-962e-c0cf011dea09",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(8131),
-                            RoleName = "Staff",
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(8131)
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Shift", b =>
@@ -346,63 +303,6 @@ namespace DataLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Shifts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "a4ec5d6c-7077-41c4-8e06-8b5e8a842ee9",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7429),
-                            Description = "Morning Part-time Shift",
-                            EndTime = new TimeSpan(0, 12, 0, 0, 0),
-                            ShiftCode = 0,
-                            ShiftType = 0,
-                            StartTime = new TimeSpan(0, 7, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7431)
-                        },
-                        new
-                        {
-                            Id = "8639d53c-101a-4177-9e8c-d1dade2163c3",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7438),
-                            Description = "Afternoon Part-time Shift",
-                            EndTime = new TimeSpan(0, 17, 0, 0, 0),
-                            ShiftCode = 1,
-                            ShiftType = 0,
-                            StartTime = new TimeSpan(0, 12, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7438)
-                        },
-                        new
-                        {
-                            Id = "d020b995-c436-49e0-ba79-de5726ec0fa6",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7441),
-                            Description = "Evening Part-time Shift",
-                            EndTime = new TimeSpan(0, 22, 0, 0, 0),
-                            ShiftCode = 2,
-                            ShiftType = 0,
-                            StartTime = new TimeSpan(0, 17, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7441)
-                        },
-                        new
-                        {
-                            Id = "2492b2c7-4af2-428a-84a4-978b3a9f788c",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7443),
-                            Description = "Morning Full-time Shift",
-                            EndTime = new TimeSpan(0, 14, 0, 0, 0),
-                            ShiftCode = 0,
-                            ShiftType = 1,
-                            StartTime = new TimeSpan(0, 7, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7444)
-                        },
-                        new
-                        {
-                            Id = "8c7902d4-c868-4214-87b4-f4581c28e37a",
-                            CreatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7446),
-                            Description = "Afternoon Full-time Shift",
-                            EndTime = new TimeSpan(0, 22, 0, 0, 0),
-                            ShiftCode = 1,
-                            ShiftType = 1,
-                            StartTime = new TimeSpan(0, 14, 0, 0, 0),
-                            UpdatedAt = new DateTime(2025, 2, 26, 16, 19, 11, 631, DateTimeKind.Utc).AddTicks(7446)
-                        });
                 });
 
             modelBuilder.Entity("DataLayer.Entities.ShiftStaff", b =>
@@ -447,9 +347,8 @@ namespace DataLayer.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Area")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Area")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -473,10 +372,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tables", t =>
-                        {
-                            t.HasCheckConstraint("CHK_Status", "Status IN ('InUse', 'Available')");
-                        });
+                    b.ToTable("Tables");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.TableBeverage", b =>
@@ -553,9 +449,8 @@ namespace DataLayer.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PaymentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PaymentType")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -568,6 +463,7 @@ namespace DataLayer.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VoucherId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -577,10 +473,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("VoucherId");
 
-                    b.ToTable("Transactions", t =>
-                        {
-                            t.HasCheckConstraint("CHK_PaymentType", "PaymentType IN ('Cashing', 'Card')");
-                        });
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.User", b =>
@@ -798,7 +691,9 @@ namespace DataLayer.Migrations
 
                     b.HasOne("DataLayer.Entities.Voucher", "Voucher")
                         .WithMany("Transactions")
-                        .HasForeignKey("VoucherId");
+                        .HasForeignKey("VoucherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("TableDetail");
 

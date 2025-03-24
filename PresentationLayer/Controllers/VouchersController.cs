@@ -63,6 +63,7 @@ namespace PresentationLayer.Controllers
             ModelState.Remove("UpdatedAt");
             ModelState.Remove("DeletedAt");
 
+            // Khởi tạo các giá trị tự động
             voucher.Id = Guid.NewGuid().ToString();
             voucher.DeletedAt = null;
 
@@ -145,5 +146,23 @@ namespace PresentationLayer.Controllers
             await _voucherService.DeleteVoucherAsync(id);
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+		public async Task<IActionResult> Check(string code)
+		{
+			var voucher = await _voucherService.GetVoucherByCodeAsync(code);
+
+			if (voucher == null || voucher.EndDate < DateTime.Today)
+			{
+				return NotFound();
+			}
+
+			return Json(new
+			{
+				isValid = true,
+				percentage = voucher.Percentage,
+				maxDiscountAmount = voucher.MaxDiscountAmount
+			});
+		}
     }
 }

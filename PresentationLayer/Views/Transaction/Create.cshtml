@@ -1,0 +1,253 @@
+﻿@model DataLayer.Entities.Transaction
+
+<form id="orderForm" method="post" action="/Transaction/Create">
+	<input type="hidden" id="tableDetailId" name="TableDetailId">
+
+	<div class="container-fluid">
+		<div class="mb-3">
+			<div class="d-flex align-items-center">
+				<label for="categoryFilter" class="form-label me-2 fw-bold">Beverage Type:</label>
+				<select id="categoryFilter" class="form-select form-select-sm w-auto" onchange="filterBeverages()">
+					<option value="">All</option>
+					@foreach (var category in ViewBag.BeverageCategories)
+					{
+						<option value="@category.Id">@category.CategoryName</option>
+					}
+				</select>
+
+				<input type="text" id="searchBeverage" class="form-control form-control-sm w-25 ms-2" placeholder="Search beverage..." onkeyup="filterBeverages()">
+			</div>
+
+		</div>
+
+
+		<div class="row">
+			<div class="col-md-8">
+				<div class="row">
+					@foreach (var beverageDetail in ViewBag.BeverageDetails)
+					{
+						<div class="col-md-4 mb-3 beverage-item" data-category="@beverageDetail.Beverage.BeverageCategory.Id">
+							<div class="card h-100">
+								<img src="@beverageDetail.Beverage.Image" class="card-img-top" alt="@beverageDetail.Beverage.Name">
+								<div class="card-body">
+									<h5 class="card-title">@beverageDetail.Beverage.Name (@beverageDetail.Size.SizeName)</h5>
+									<p class="card-text">@beverageDetail.Price VND</p>
+									<button type="button" class="btn btn-custom"
+											onclick="addToOrder('@beverageDetail.Id', '@beverageDetail.Beverage.Name (@beverageDetail.Size.SizeName)', '@beverageDetail.Price')">
+										Add To Order
+									</button>
+
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<h4>Order</h4>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Quantity</th>
+							<th>Price</th>
+							<th>Total</th>
+						</tr>
+					</thead>
+					<tbody id="order-list"></tbody>
+					<tfoot>
+						<tr>
+							<td colspan="3" class="text-end"><strong>Grand Total:</strong></td>
+							<td id="grand-total">0 VND</td>
+						</tr>
+					</tfoot>
+				</table>
+
+				<div class="mb-3">
+					<label for="tableNumber" class="form-label">Table:</label>
+					<select id="tableNumber" name="TableId" class="form-control">
+						@foreach (var table in ViewBag.Tables)
+						{
+							<option value="@table.Id">@table.TableName</option>
+						}
+					</select>
+				</div>
+
+
+				<div class="mb-3 d-flex align-items-center">
+					<label for="voucherCode" class="form-label me-2">Voucher:</label>
+					<input type="text" id="voucherCode" name="VoucherCode" class="form-control w-50 me-2" placeholder="Enter voucher code" onkeypress="handleEnter(event)">
+					<button type="button" id="applyVoucherBtn" class="btn btn-success" onclick="applyVoucher()">Discount</button>
+				</div>
+				<p><strong>Discount:</strong> <span id="discountAmount">0</span> VND</p>
+				<p><strong>Total amount:</strong> <span id="finalPrice">0</span> VND</p>
+
+				<div class="mb-3">
+					<label for="paymentType" class="form-label fw-bold">Payment Method:</label>
+					<select asp-for="PaymentType" class="form-select" asp-items="ViewBag.PaymentTypes"></select>
+				</div>
+
+
+				<div id="hidden-inputs"></div>
+
+				<button type="submit" class="btn btn-custom w-100 mt-3" onclick="prepareOrder()">Order</button>
+			</div>
+		</div>
+	</div>
+</form>
+
+
+<script>
+    let orderList = [];
+    let appliedVoucher = null;
+
+    function getListOrderPrice() {
+        return orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    }
+
+    function addToOrder(id, name, price) {
+        const existingItem = orderList.find(item => item.id === id);
+        if (existingItem) {
+            existingItem.quantity++;
+        } else {
+            orderList.push({ id, name, price: parseFloat(price), quantity: 1 });
+        }
+        renderOrderList();
+        updateDiscountDisplay()
+    }
+
+    function updateQuantity(id, change) {
+        const item = orderList.find(item => item.id === id);
+        if (item) {
+            item.quantity += change;
+            if (item.quantity <= 0) {
+                orderList = orderList.filter(i => i.id !== id);
+            }
+            renderOrderList();
+            updateDiscountDisplay()
+        }
+    }
+
+    function renderOrderList() {
+        const orderListElement = document.getElementById('order-list');
+        const grandTotalElement = document.getElementById('grand-total');
+        let grandTotal = 0;
+
+        orderListElement.innerHTML = '';
+        orderList.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            grandTotal += itemTotal;
+
+            orderListElement.innerHTML += `
+                                <tr>
+                                    <td>${item.name}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger" type="button" onclick="updateQuantity('${item.id}', -1)">-</button>
+                                        ${item.quantity}
+                                        <button class="btn btn-sm btn-success" type="button" onclick="updateQuantity('${item.id}', 1)">+</button>
+                                    </td>
+                                    <td>${item.price.toLocaleString()}</td>
+                                    <td>${itemTotal.toLocaleString()}</td>
+                                </tr>
+                            `;
+        });
+        grandTotalElement.innerText = `${grandTotal.toLocaleString()} VND`;
+        calculateTotalPrice()
+    }
+
+    function calculateTotalPrice() {
+        let totalPrice = orderList.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let discountAmount = 0;
+
+        if (appliedVoucher) {
+            discountAmount = Math.min((totalPrice * appliedVoucher.percentage) / 100, appliedVoucher.maxDiscountAmount);
+        }
+
+        document.getElementById("finalPrice").innerText = (totalPrice - discountAmount).toLocaleString();
+    }
+
+    function updateDiscountDisplay() {
+        if (appliedVoucher) {
+            let discountAmount = getDiscountAmount();
+            document.getElementById("discountAmount").innerText = discountAmount.toLocaleString();
+        }
+    }
+
+    function prepareOrder() {
+        const hiddenInputsContainer = document.getElementById('hidden-inputs');
+        hiddenInputsContainer.innerHTML = '';
+
+        orderList.forEach((item, index) => {
+            hiddenInputsContainer.innerHTML += `
+                                <input type="hidden" name="Items[${index}].BeverageDetailId" value="${item.id}">
+                                <input type="hidden" name="Items[${index}].Quantity" value="${item.quantity}">
+                            `;
+        });
+
+        let finalPrice = getListOrderPrice() - getDiscountAmount();
+        hiddenInputsContainer.innerHTML += `
+                    <input type="hidden" name="finalPrice" value="${finalPrice}">
+                    `;
+    }
+
+    function getDiscountAmount() {
+        let totalPrice = getListOrderPrice();
+        let discountAmount = 0;
+
+        if (appliedVoucher) {
+            discountAmount = Math.min((totalPrice * appliedVoucher.percentage) / 100, appliedVoucher.maxDiscountAmount);
+        }
+
+        return discountAmount;
+    }
+
+    function applyVoucher() {
+        let voucherCodeInput = document.getElementById("voucherCode");
+        let voucherCode = document.getElementById("voucherCode").value.trim();
+
+        if (!voucherCode) {
+            alert("Please Enter Voucher Code");
+            return;
+        }
+
+        fetch(`/Vouchers/Check?code=${voucherCode}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Voucher is invalid or expired");
+                }
+                return response.json();
+            })
+            .then(data => {
+                let totalPrice = getListOrderPrice();
+                appliedVoucher = data;
+                let discountAmount = getDiscountAmount();
+                document.getElementById("discountAmount").innerText = discountAmount.toLocaleString();
+            })
+            .catch(error => {
+                alert(error.message);
+                voucherCodeInput.value = "";
+                let totalPrice = getListOrderPrice();
+                document.getElementById("discountAmount").innerText = "0";
+            })
+            .finally(() => {
+                calculateTotalPrice()
+            });
+    }
+
+    function filterBeverages() {
+        let selectedCategory = document.getElementById("categoryFilter").value;
+        let searchText = document.getElementById("searchBeverage").value.toLowerCase();
+        let beverageItems = document.querySelectorAll(".beverage-item");
+
+        beverageItems.forEach(item => {
+            let itemCategory = item.getAttribute("data-category");
+            let itemName = item.querySelector(".card-title").innerText.toLowerCase();
+
+            let matchCategory = selectedCategory === "" || itemCategory === selectedCategory;
+            let matchSearch = searchText === "" || itemName.includes(searchText);
+
+            item.style.display = matchCategory && matchSearch ? "block" : "none";
+        });
+    }
+</script>
