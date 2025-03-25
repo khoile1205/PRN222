@@ -1,0 +1,45 @@
+﻿@model IEnumerable<DataLayer.Entities.User>
+
+@{
+    ViewData["Title"] = "Salary - Admin View";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h2 class="mb-0 text-center">Salary Management</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Staff ID</th>
+                            <th>Staff Name</th>
+                            <th>Role</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td>@user.Id</td>
+                                <td>@user.Name</td>
+                                <td>@user.Role?.RoleName</td>
+                                <td class="text-center">
+                                    <a class="btn btn-primary btn-sm"
+                                       asp-action="ViewSalary"
+                                       asp-route-staffId="@user.Id"
+                                       asp-controller="Salary">
+                                        View Salary
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

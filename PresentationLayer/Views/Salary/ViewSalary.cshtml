@@ -1,0 +1,82 @@
+﻿@model BussinessLayer.DTOs.Salary.SalarySummaryDTO
+
+@{
+    ViewData["Title"] = "Salary Details";
+    int selectedMonth = ViewBag.SelectedMonth ?? DateTime.Today.Month;
+    int selectedYear = ViewBag.SelectedYear ?? DateTime.Today.Year;
+    var staffId = Context.Request.Query["staffId"].FirstOrDefault() ?? Model.StaffId;
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-success text-white">
+            <h2>Salary Details for @selectedMonth/@selectedYear</h2>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="ViewSalary">
+                <input type="hidden" name="staffId" value="@staffId" />
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="month">Month</label>
+                        <select id="month" name="month" class="form-control">
+                            @for (int m = 1; m <= 12; m++)
+                            {
+                                <option value="@m" selected="@(m == selectedMonth ? "selected" : null)">@m</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="year">Year</label>
+                        <select id="year" name="year" class="form-control">
+                            @for (int y = DateTime.Today.Year - 5; y <= DateTime.Today.Year + 1; y++)
+                            {
+                                <option value="@y" selected="@(y == selectedYear ? "selected" : null)">@y</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table table-bordered table-striped mt-4">
+                <tr>
+                    <th>Staff Name</th>
+                    <td>@Model.StaffName</td>
+                </tr>
+                <tr>
+                    <th>Staff ID</th>
+                    <td>@Model.StaffId</td>
+                </tr>
+                <tr>
+                    <th>Total Full-time Shifts</th>
+                    <td>@Model.TotalFullTimeShifts</td>
+                </tr>
+                <tr>
+                    <th>Total Part-time Shifts</th>
+                    <td>@Model.TotalPartTimeShifts</td>
+                </tr>
+                <tr>
+                    <th>Total Full-time Hours</th>
+                    <td>@Model.TotalFullTimeHours</td>
+                </tr>
+                <tr>
+                    <th>Total Part-time Hours</th>
+                    <td>@Model.TotalPartTimeHours</td>
+                </tr>
+                <tr>
+                    <th>Total Hours Worked</th>
+                    <td>@Model.TotalHours</td>
+                </tr>
+                <tr>
+                    <th>Total Salary</th>
+                    <td>@Model.TotalSalary.ToString("C")</td>
+                </tr>
+            </table>
+        </div>
+        <div class="card-footer text-center">
+            <a asp-action="Index" asp-controller="Salary" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+    </div>
+</div>

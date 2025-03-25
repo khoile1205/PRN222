@@ -23,6 +23,7 @@ namespace DataLayer.Entities
         public DbSet<TableDetail> TableDetails { get; set; }
         public DbSet<TableBeverage> TableBeverages { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        public DbSet<Salary> Salaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
