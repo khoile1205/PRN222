@@ -249,7 +249,7 @@ namespace PresentationLayer.Controllers
 
         [HttpPost("Users/EditProfile")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProfile([Bind("Id,UserName,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,StartDate")] User user)
+        public async Task<IActionResult> EditProfile([Bind("Id,Name,PhoneNumber,Email,Gender")] User user)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null || userId != user.Id)
@@ -261,8 +261,17 @@ namespace PresentationLayer.Controllers
             {
                 try
                 {
-                    user.UpdatedAt = TimeHelper.GetVietnamTime();
-                    await userService.UpdateUser(user);
+                    var existingUser = await userService.GetUserById(userId);
+                    if (existingUser == null) return NotFound();
+
+                    // Only update allowed fields
+                    existingUser.Name = user.Name;
+                    existingUser.PhoneNumber = user.PhoneNumber;
+                    existingUser.Email = user.Email;
+                    existingUser.Gender = user.Gender;
+                    existingUser.UpdatedAt = TimeHelper.GetVietnamTime();
+
+                    await userService.UpdateUser(existingUser);
 
                     TempData["SuccessMessage"] = "Profile updated successfully!";
                     return RedirectToAction("Profile");
@@ -272,10 +281,12 @@ namespace PresentationLayer.Controllers
                     TempData["ErrorMessage"] = "Data has been changed, please try again!";
                 }
             }
+
             ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
-                                        .Cast<Gender>()
-                                        .Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name", (int)user.Gender);
+                .Cast<Gender>().Select(g => new { Id = (int)g, Name = g.ToString() }), "Id", "Name", (int)user.Gender);
+
             return View(user);
         }
+
     }
 }
