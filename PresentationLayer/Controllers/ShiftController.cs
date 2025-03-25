@@ -134,13 +134,9 @@ namespace PresentationLayer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ShiftCalendar()
         {
-            // Optional: load next 30 days or configurable range
-            var startDate = TimeHelper.GetVietnamTime().Date;
-            var endDate = startDate.AddDays(30);
+            // Load ALL approved shifts without range limit
+            var approvedShifts = await _shiftStaffService.GetApprovedShiftRequestsByDateRangeAsync(DateTime.MinValue, DateTime.MaxValue);
 
-            var approvedShifts = await _shiftStaffService.GetApprovedShiftRequestsByDateRangeAsync(startDate, endDate);
-
-            // Group by date to easily pass data to calendar
             var groupedShifts = approvedShifts
                 .GroupBy(s => s.ShiftDate.Date)
                 .Select(g => new ShiftCalendarViewModel
@@ -157,6 +153,5 @@ namespace PresentationLayer.Controllers
 
             return View(groupedShifts);
         }
-
     }
 }
