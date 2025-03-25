@@ -1,4 +1,6 @@
-﻿using BussinessLayer.DTOs.Salary;
+﻿using AutoMapper;
+using BussinessLayer.DTOs.Salary;
+using BussinessLayer.DTOs.ShiftStaff;
 using BussinessLayer.Helper;
 using BussinessLayer.Services.Abstraction;
 using DataLayer.Entities;
@@ -19,90 +21,86 @@ namespace BussinessLayer.Services
         private const decimal PART_TIME_HOURLY_RATE = 20000m;
 
         private readonly IGenericRepository<ShiftStaff> _shiftStaffRepository;
-        private readonly IGenericRepository<Salary> _salaryRepository;
         private readonly IGenericRepository<User> _userRepository;
-
+        private readonly IMapper _mapper;
         public SalaryService(IGenericRepository<ShiftStaff> shiftStaffRepository,
-                             IGenericRepository<Salary> salaryRepository,
-                             IGenericRepository<User> userRepository)
+                             IGenericRepository<User> userRepository, IMapper mapper)
         {
             _shiftStaffRepository = shiftStaffRepository;
-            _salaryRepository = salaryRepository;
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
-        public async Task<SalarySummaryDTO> GetSalaryForStaffAsync(string staffId, DateTime startDate, DateTime endDate)
+        public async Task<SalarySummaryDTO> GetSalaryForStaffAsync(string staffId, int month, int year)
         {
-            var shiftStaffs = await _shiftStaffRepository.GetAllAsync(
-                filter: s => s.StaffId.ToUpper() == staffId.ToUpper()
-                            && s.ShiftDate >= startDate
-                            && s.ShiftDate <= endDate,
-                includes: q => q.Include(s => s.Shift)
-                                .Include(s => s.Staff)
-            );
-
-            int fullTimeShifts = 0;
-            int partTimeShifts = 0;
-            int fullTimeHours = 0;
-            int partTimeHours = 0;
-
-            foreach (var record in shiftStaffs)
+            try
             {
-                if (record.Shift == null)
-                    continue;
+                DateTime startOfMonth = DateTimeHelper.GetStartOfMonth(month, year);
+                DateTime endOfMonth = DateTimeHelper.GetEndOfMonth(month, year);
 
-                int shiftHours = (int)(record.Shift.EndTime - record.Shift.StartTime).TotalHours;
-
-                if (record.Shift.ShiftType == ShiftType.FullTime)
+                var existingStaff = await _userRepository.GetAsync(u => u.Id == staffId);
+                if (existingStaff == null)
                 {
-                    fullTimeShifts++;
-                    fullTimeHours += shiftHours;
+                    throw new Exception("Staff member not found");
                 }
-                else if (record.Shift.ShiftType == ShiftType.PartTime)
+
+                var shiftStaffs = await _shiftStaffRepository.GetAllAsync(
+                    filter: s => s.StaffId == staffId
+                                && s.ShiftDate >= startOfMonth
+                                && s.ShiftDate <= endOfMonth
+                                && s.Status == RequestStatus.Accepted,
+                    includes: q => q.Include(s => s.Shift)
+                                    .Include(s => s.Staff).ThenInclude(s => s.Role)
+                );
+
+                int fullTimeShifts = 0;
+                int partTimeShifts = 0;
+                int fullTimeHours = 0;
+                int partTimeHours = 0;
+
+                foreach (var record in shiftStaffs)
                 {
-                    partTimeShifts++;
-                    partTimeHours += shiftHours;
+                    if (record.Shift == null)
+                        continue;
+
+                    int shiftHours = (int)(record.Shift.EndTime - record.Shift.StartTime).TotalHours;
+
+                    if (record.Shift.ShiftType == ShiftType.FullTime)
+                    {
+                        fullTimeShifts++;
+                        fullTimeHours += shiftHours;
+                    }
+                    else if (record.Shift.ShiftType == ShiftType.PartTime)
+                    {
+                        partTimeShifts++;
+                        partTimeHours += shiftHours;
+                    }
                 }
+
+                int totalHours = fullTimeHours + partTimeHours;
+                decimal totalSalary = (fullTimeHours * FULL_TIME_HOURLY_RATE) + (partTimeHours * PART_TIME_HOURLY_RATE);
+
+                var shiftStaffDtos = _mapper.Map<IEnumerable<ShiftStaffDTO>>(shiftStaffs.OrderBy(ss => ss.ShiftDate));
+
+                return new SalarySummaryDTO
+                {
+                    StaffId = staffId,
+                    StaffName = existingStaff.Name,
+                    StaffRole = existingStaff.Role.RoleName,
+                    TotalFullTimeShifts = fullTimeShifts,
+                    TotalPartTimeShifts = partTimeShifts,
+                    TotalFullTimeHours = fullTimeHours,
+                    TotalPartTimeHours = partTimeHours,
+                    TotalHours = totalHours,
+                    TotalSalary = totalSalary,
+                    ShiftStaffs = shiftStaffDtos
+                };
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error while getting salary data", e);
             }
 
-            int totalHours = fullTimeHours + partTimeHours;
-            decimal totalSalary = (fullTimeHours * FULL_TIME_HOURLY_RATE) + (partTimeHours * PART_TIME_HOURLY_RATE);
-
-            var salaryRecord = new Salary
-            {
-                StaffId = staffId,
-                SalaryDate = TimeHelper.GetVietnamTime(),
-                FullTimeShiftCount = fullTimeShifts,
-                PartTimeShiftCount = partTimeShifts,
-                TotalHours = totalHours,
-                TotalSalary = totalSalary
-            };
-
-            await _salaryRepository.CreateAsync(salaryRecord);
-
-            string staffName;
-            if (shiftStaffs.Any())
-            {
-                staffName = shiftStaffs.First().Staff?.Name;
-            }
-            else
-            {
-                var user = await _userRepository.GetAsync(u => u.Id.ToUpper() == staffId.ToUpper());
-                staffName = user?.Name;
-            }
-            staffName = string.IsNullOrEmpty(staffName) ? "Unknown" : staffName;
-
-            return new SalarySummaryDTO
-            {
-                StaffId = staffId,
-                StaffName = staffName,
-                TotalFullTimeShifts = fullTimeShifts,
-                TotalPartTimeShifts = partTimeShifts,
-                TotalFullTimeHours = fullTimeHours,
-                TotalPartTimeHours = partTimeHours,
-                TotalHours = totalHours,
-                TotalSalary = totalSalary
-            };
         }
     }
 }

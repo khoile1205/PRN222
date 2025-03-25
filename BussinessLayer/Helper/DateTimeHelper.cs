@@ -23,6 +23,36 @@ namespace BussinessLayer.Helper
         }
 
         /// <summary>
+        /// Gets the start of the month containing month and year
+        /// </summary>
+        public static DateTime GetStartOfMonth(int month, int year)
+        {
+            return new DateTime(year, month, 1);
+        }
+
+        /// <summary>
+        /// Returns the last moment of the last day of the month for the specified date.
+        /// The returned DateTime is set to 23:59:59 (11:59:59 PM) of the final day of the month.
+        /// </summary>
+        /// <param name="date">The date used to determine the year and month. The day component is ignored.</param>
+        /// <returns>A DateTime representing the end of the specified month (e.g., 2025-03-31 23:59:59).</returns>
+        public static DateTime GetEndOfMonth(DateTime date)
+        {
+            return new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month))
+                .AddHours(23)
+                .AddMinutes(59)
+                .AddSeconds(59);
+        }
+
+        public static DateTime GetEndOfMonth(int month, int year)
+        {
+            return new DateTime(year, month, DateTime.DaysInMonth(year, month))
+                .AddHours(23)
+                .AddMinutes(59)
+                .AddSeconds(59);
+        }
+
+        /// <summary>
         /// Gets the quarter (1-4) for the specified date
         /// </summary>
         public static int GetQuarter(DateTime date)

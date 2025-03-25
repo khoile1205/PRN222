@@ -9,6 +9,6 @@ namespace BussinessLayer.Services.Abstraction
 {
     public interface ISalaryService
     {
-        Task<SalarySummaryDTO> GetSalaryForStaffAsync(string staffId, DateTime startDate, DateTime endDate);
+        Task<SalarySummaryDTO> GetSalaryForStaffAsync(string staffId,  int month, int year);
     }
 }

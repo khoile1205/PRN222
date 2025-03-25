@@ -59,7 +59,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Beverages");
+                    b.ToTable("Beverages", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageCategory", b =>
@@ -86,7 +86,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BeverageCategories");
+                    b.ToTable("BeverageCategories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageDetail", b =>
@@ -120,7 +120,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("BeverageDetails");
+                    b.ToTable("BeverageDetails", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageSize", b =>
@@ -143,7 +143,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BeverageSizes");
+                    b.ToTable("BeverageSizes", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Inventory", b =>
@@ -184,7 +184,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Inventories");
+                    b.ToTable("Inventories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.InventoryCategory", b =>
@@ -207,7 +207,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryCategories");
+                    b.ToTable("InventoryCategories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.InventoryUpdateHistory", b =>
@@ -241,7 +241,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("InventoryUpdateHistories");
+                    b.ToTable("InventoryUpdateHistories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Role", b =>
@@ -264,47 +264,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
-                });
-
-            modelBuilder.Entity("DataLayer.Entities.Salary", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("FullTimeShiftCount")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PartTimeShiftCount")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SalaryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StaffId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal>("TotalHours")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TotalSalary")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StaffId");
-
-                    b.ToTable("Salaries");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Shift", b =>
@@ -339,7 +299,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shifts");
+                    b.ToTable("Shifts", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.ShiftStaff", b =>
@@ -376,7 +336,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("ShiftStaff");
+                    b.ToTable("ShiftStaff", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Table", b =>
@@ -410,7 +370,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tables", t =>
+                    b.ToTable("Tables", null, t =>
                         {
                             t.HasCheckConstraint("CHK_Status", "Status IN ('InUse', 'Available')");
                         });
@@ -447,7 +407,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("TableDetailId");
 
-                    b.ToTable("TableBeverages");
+                    b.ToTable("TableBeverages", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.TableDetail", b =>
@@ -476,7 +436,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("TableId");
 
-                    b.ToTable("TableDetails");
+                    b.ToTable("TableDetails", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Transaction", b =>
@@ -514,7 +474,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("VoucherId");
 
-                    b.ToTable("Transactions", t =>
+                    b.ToTable("Transactions", null, t =>
                         {
                             t.HasCheckConstraint("CHK_PaymentType", "PaymentType IN ('Cashing', 'Card')");
                         });
@@ -579,7 +539,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Voucher", b =>
@@ -621,7 +581,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vouchers");
+                    b.ToTable("Vouchers", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Beverage", b =>
@@ -674,17 +634,6 @@ namespace DataLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("Inventory");
-                });
-
-            modelBuilder.Entity("DataLayer.Entities.Salary", b =>
-                {
-                    b.HasOne("DataLayer.Entities.User", "Staff")
-                        .WithMany()
-                        .HasForeignKey("StaffId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Staff");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.ShiftStaff", b =>

@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize]
     public class SalaryController : Controller
     {
         private readonly ISalaryService _salaryService;
@@ -18,14 +19,21 @@ namespace PresentationLayer.Controllers
             _userService = userService;
         }
 
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            var currentUserId = User.FindFirst("sub")?.Value;
+
+            if (userRole == "Staff")
+            {
+                // Redirect Staff to their own salary view
+                return RedirectToAction("ViewSalary", new { staffId = currentUserId });
+            }
+
             var allUsers = await _userService.GetAllUsers();
             return View(allUsers);
         }
 
-        [Authorize(Roles = "Admin, Staff")]
         public async Task<IActionResult> ViewSalary(string? staffId, int? month, int? year)
         {
             var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
@@ -46,10 +54,7 @@ namespace PresentationLayer.Controllers
             int selectedMonth = month ?? DateTime.Today.Month;
             int selectedYear = year ?? DateTime.Today.Year;
 
-            DateTime startOfMonth = new DateTime(selectedYear, selectedMonth, 1);
-            DateTime endDate = TimeHelper.GetVietnamTime();
-
-            SalarySummaryDTO salaryData = await _salaryService.GetSalaryForStaffAsync(staffId, startOfMonth, endDate);
+            SalarySummaryDTO salaryData = await _salaryService.GetSalaryForStaffAsync(staffId, selectedMonth, selectedYear);
 
             ViewBag.SelectedMonth = selectedMonth;
             ViewBag.SelectedYear = selectedYear;

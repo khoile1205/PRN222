@@ -1,33 +1,49 @@
 ﻿@model BussinessLayer.DTOs.Salary.SalarySummaryDTO
 
 @{
-    ViewData["Title"] = "Salary Details";
+    ViewData["Title"] = "Salary Overview";
     int selectedMonth = ViewBag.SelectedMonth ?? DateTime.Today.Month;
     int selectedYear = ViewBag.SelectedYear ?? DateTime.Today.Year;
     var staffId = Context.Request.Query["staffId"].FirstOrDefault() ?? Model.StaffId;
 }
 
-<div class="container mt-5">
-    <div class="card shadow">
-        <div class="card-header bg-success text-white">
-            <h2>Salary Details for @selectedMonth/@selectedYear</h2>
+<div class="container py-5">
+    @if (Model.StaffRole == Shared.Enums.RoleEnum.Admin)
+    {
+        <div class="row mb-4">
+            <div class="col-12">
+                <a asp-action="Index" asp-controller="Salary" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i> Back to dashboard
+                </a>
+            </div>
         </div>
-        <div class="card-body">
-            <form method="get" asp-action="ViewSalary">
+    }
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">Salary Overview</h1>
+            <p class="text-muted">Details for @selectedMonth/@selectedYear</p>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-8 col-lg-6">
+            <form method="get" asp-action="ViewSalary" class="card p-3 shadow-sm">
                 <input type="hidden" name="staffId" value="@staffId" />
-                <div class="row">
-                    <div class="col-md-3">
-                        <label for="month">Month</label>
-                        <select id="month" name="month" class="form-control">
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label for="month" class="form-label fw-semibold">Month</label>
+                        <select id="month" name="month" class="form-select">
                             @for (int m = 1; m <= 12; m++)
                             {
-                                <option value="@m" selected="@(m == selectedMonth ? "selected" : null)">@m</option>
+                                <option value="@m" selected="@(m == selectedMonth ? "selected" : null)">@System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)</option>
                             }
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label for="year">Year</label>
-                        <select id="year" name="year" class="form-control">
+                    <div class="col-md-5">
+                        <label for="year" class="form-label fw-semibold">Year</label>
+                        <select id="year" name="year" class="form-select">
                             @for (int y = DateTime.Today.Year - 5; y <= DateTime.Today.Year + 1; y++)
                             {
                                 <option value="@y" selected="@(y == selectedYear ? "selected" : null)">@y</option>
@@ -35,48 +51,110 @@
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
                     </div>
                 </div>
             </form>
-
-            <table class="table table-bordered table-striped mt-4">
-                <tr>
-                    <th>Staff Name</th>
-                    <td>@Model.StaffName</td>
-                </tr>
-                <tr>
-                    <th>Staff ID</th>
-                    <td>@Model.StaffId</td>
-                </tr>
-                <tr>
-                    <th>Total Full-time Shifts</th>
-                    <td>@Model.TotalFullTimeShifts</td>
-                </tr>
-                <tr>
-                    <th>Total Part-time Shifts</th>
-                    <td>@Model.TotalPartTimeShifts</td>
-                </tr>
-                <tr>
-                    <th>Total Full-time Hours</th>
-                    <td>@Model.TotalFullTimeHours</td>
-                </tr>
-                <tr>
-                    <th>Total Part-time Hours</th>
-                    <td>@Model.TotalPartTimeHours</td>
-                </tr>
-                <tr>
-                    <th>Total Hours Worked</th>
-                    <td>@Model.TotalHours</td>
-                </tr>
-                <tr>
-                    <th>Total Salary</th>
-                    <td>@Model.TotalSalary.ToString("C")</td>
-                </tr>
-            </table>
         </div>
-        <div class="card-footer text-center">
-            <a asp-action="Index" asp-controller="Salary" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <!-- Salary Summary Card -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Summary for @Model.StaffName</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-muted">Full-time Shifts</h6>
+                                <p class="fw-bold mb-0">@Model.TotalFullTimeShifts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-muted">Part-time Shifts</h6>
+                                <p class="fw-bold mb-0">@Model.TotalPartTimeShifts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-muted">Full-time Hours</h6>
+                                <p class="fw-bold mb-0">@Model.TotalFullTimeHours</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-muted">Part-time Hours</h6>
+                                <p class="fw-bold mb-0">@Model.TotalPartTimeHours</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="text-muted">Total Hours</h6>
+                                <p class="fw-bold mb-0">@Model.TotalHours</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-success text-white rounded">
+                                <h6 class="mb-1">Total Salary</h6>
+                                <p class="fw-bold mb-0">@Model.TotalSalary.ToString("C")</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shift Details Table -->
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="card shadow border-0">
+                <div class="card-header bg-secondary text-white">
+                    <h4 class="mb-0">Shift Details</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.ShiftStaffs != null && Model.ShiftStaffs.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Shift Code</th>
+                                        <th scope="col">Description</th>
+                                        <th scope="col">Start</th>
+                                        <th scope="col">End</th>
+                                        <th scope="col">Type</th>
+                                        <th scope="col">Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var shift in Model.ShiftStaffs)
+                                    {
+                                        <tr>
+                                            <td>@shift.ShiftDate.ToString("MMM dd, yyyy")</td>
+                                            <td>@shift.ShiftCode</td>
+                                            <td>@shift.ShiftDescription</td>
+                                            <td>@shift.StartTime.ToString(@"hh\:mm")</td>
+                                            <td>@shift.EndTime.ToString(@"hh\:mm")</td>
+                                            <td>@shift.ShiftType</td>
+                                            <td>@((shift.EndTime - shift.StartTime).TotalHours.ToString("F1"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center">No shifts recorded for this period.</p>
+                    }
+                </div>
+            </div>
         </div>
     </div>
 </div>
