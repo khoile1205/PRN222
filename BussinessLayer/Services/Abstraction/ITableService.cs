@@ -11,6 +11,10 @@ namespace BussinessLayer.Services.Abstraction
     {
         Task<IEnumerable<Table>> GetAllTablesAsync();
         Task<Table?> GetTableByIdAsync(string id);
+        Task CreateTableAsync(Table table);
+        Task UpdateTableAsync(Table table);
+        Task<bool> DeleteTableAsync(string id);
+
     }
 
 }
