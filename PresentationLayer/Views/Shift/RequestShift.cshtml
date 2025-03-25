@@ -19,3 +19,14 @@
 
     <button type="submit" class="btn btn-primary">Request</button>
 </form>
+<script>
+    window.onload = function () {
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // Set tomorrow
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const minDate = `${yyyy}-${mm}-${dd}`;
+        document.querySelector('input[name="ShiftDate"]').setAttribute('min', minDate);
+    }
+</script>

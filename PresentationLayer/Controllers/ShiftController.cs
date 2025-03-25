@@ -46,11 +46,17 @@ namespace PresentationLayer.Controllers
             var staffId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(staffId))
             {
-                Console.WriteLine("❌ StaffId is missing in claims! Redirecting to login.");
+                Console.WriteLine("StaffId is missing in claims! Redirecting to login.");
                 return RedirectToAction("Login", "Auth");
             }
-            Console.WriteLine($"✅ Retrieved StaffId: {staffId}");
+            Console.WriteLine($"Retrieved StaffId: {staffId}");
 
+            // Date validation
+            if (shiftStaff.ShiftDate <= DateTime.Today)
+            {
+                TempData["ErrorMessage"] = "Shift date must be in the future.";
+                return RedirectToAction("RequestShift");
+            }
 
             try
             {
@@ -73,7 +79,7 @@ namespace PresentationLayer.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"⚠️ Error during request: {ex.Message}");
+                Console.WriteLine($"Error during request: {ex.Message}");
                 TempData["ErrorMessage"] = "An error occurred while processing your request.";
                 return RedirectToAction("RequestShift");
             }
@@ -87,10 +93,10 @@ namespace PresentationLayer.Controllers
             var staffId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(staffId))
             {
-                Console.WriteLine("❌ StaffId is missing in claims! Redirecting to login.");
+                Console.WriteLine("StaffId is missing in claims! Redirecting to login.");
                 return RedirectToAction("Login", "Auth");
             }
-            Console.WriteLine($"✅ Retrieved StaffId: {staffId}");
+            Console.WriteLine($"Retrieved StaffId: {staffId}");
 
 
             var requests = await _shiftStaffService.GetAllShiftRequestsAsync();

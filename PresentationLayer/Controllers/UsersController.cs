@@ -226,6 +226,7 @@ namespace PresentationLayer.Controllers
             return View(user);
         }
 
+        [HttpGet("Users/EditProfile")]
         public async Task<IActionResult> EditProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -246,6 +247,8 @@ namespace PresentationLayer.Controllers
             return View(user);
         }
 
+        [HttpPost("Users/EditProfile")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile([Bind("Id,UserName,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,StartDate")] User user)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
