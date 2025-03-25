@@ -55,6 +55,21 @@ namespace BussinessLayer.Services
                 throw new ArgumentException("Invalid shift status.");
             }
         }
+
+        //Add up
+        public async Task<List<ShiftStaff>> GetApprovedShiftRequestsByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            var results = await _shiftStaffRepository.GetAllAsync(
+                filter: ss => ss.Status == DataLayer.Enums.RequestStatus.Accepted
+                              && ss.ShiftDate.Date >= startDate.Date
+                              && ss.ShiftDate.Date <= endDate.Date,
+                includes: ss => ss.Include(x => x.Shift).Include(x => x.Staff)
+            );
+
+            return results.ToList();
+        }
+
+
     }
 }
 

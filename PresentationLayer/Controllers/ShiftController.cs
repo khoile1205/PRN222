@@ -7,6 +7,7 @@ using DataLayer.Enums;
 using BussinessLayer.Helper;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using PresentationLayer.ViewModel;
 
 namespace PresentationLayer.Controllers
 {
@@ -126,5 +127,36 @@ namespace PresentationLayer.Controllers
             TempData["SuccessMessage"] = "Shift rejected.";
             return RedirectToAction("ApproveRequests");
         }
+
+        //Add up
+
+        // Admin view for upcoming approved shifts in calendar form
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ShiftCalendar()
+        {
+            // Optional: load next 30 days or configurable range
+            var startDate = TimeHelper.GetVietnamTime().Date;
+            var endDate = startDate.AddDays(30);
+
+            var approvedShifts = await _shiftStaffService.GetApprovedShiftRequestsByDateRangeAsync(startDate, endDate);
+
+            // Group by date to easily pass data to calendar
+            var groupedShifts = approvedShifts
+                .GroupBy(s => s.ShiftDate.Date)
+                .Select(g => new ShiftCalendarViewModel
+                {
+                    Date = g.Key,
+                    Registrations = g.Select(x => new ShiftRegistrationDetail
+                    {
+                        StaffName = x.Staff.Name,
+                        ShiftDescription = x.Shift.Description,
+                        ShiftStartTime = x.Shift.StartTime,
+                        ShiftEndTime = x.Shift.EndTime
+                    }).ToList()
+                }).ToList();
+
+            return View(groupedShifts);
+        }
+
     }
 }
