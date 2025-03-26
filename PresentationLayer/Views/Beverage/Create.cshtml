@@ -41,9 +41,15 @@
 
     <div class="form-group">
         <label asp-for="ImageUrl"></label>
-        <input asp-for="ImageUrl" class="form-control" />
+        <input asp-for="ImageUrl" id="imageUrl" class="form-control" readonly />
         <span asp-validation-for="ImageUrl" class="text-danger"></span>
     </div>
+    
+     <div class="form-group">
+        <label>Upload Image</label>
+        <partial name="_UploadImagePartial" />
+    </div>
+
 
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>

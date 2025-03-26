@@ -25,11 +25,32 @@
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
 
+    <!-- Hidden input to store the Cloudinary ImageUrl -->
+    <input type="hidden" asp-for="ImageUrl" id="imageUrl" />
+
+    <!-- Display current image if it exists -->
     <div class="form-group">
+        <label class="form-label">Current Image</label>
+        <div id="currentImage">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="Current Beverage Image" style="max-width: 200px;" />
+            }
+            else
+            {
+                <p>No image available</p>
+            }
+        </div>
+    </div>
+     <div class="form-group">
+        <label>Upload Image</label>
+        <partial name="_UploadImagePartial" />
+    </div>
+    @* <div class="form-group">
         <label asp-for="ImageUrl" class="form-label"></label>
         <input asp-for="ImageUrl" class="form-control" />
         <span asp-validation-for="ImageUrl" class="text-danger"></span>
-    </div>
+    </div> *@
 
     <button type="submit" class="btn btn-primary">Save</button>
 </form>

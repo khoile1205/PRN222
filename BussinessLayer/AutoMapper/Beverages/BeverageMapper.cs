@@ -8,7 +8,10 @@ namespace BussinessLayer.AutoMapper.Beverages
     {
         public BeverageMapper()
         {
-            CreateMap<Beverage, CreateBeverageDTO>().ReverseMap();
+            CreateMap<Beverage, CreateBeverageDTO>()
+               .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Image))
+               .ReverseMap()
+               .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.ImageUrl));
 
             CreateMap<BeverageDetail, CreateBeverageDTO>().ReverseMap()
                 .ForMember(dest => dest.BeverageId, opt => opt.Ignore())
