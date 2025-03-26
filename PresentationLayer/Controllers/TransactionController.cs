@@ -64,7 +64,7 @@ namespace PresentationLayer.Controllers
 				.OrderBy(c => c.CategoryName)
 				.ToList();
 
-			ViewBag.Tables = await _tableService.GetAllTablesAsync();
+			ViewBag.Tables = await _tableService.GetAvailableTablesAsync();
 			ViewBag.PaymentTypes = new SelectList(
 				Enum.GetValues(typeof(PaymentType))
 					.Cast<PaymentType>()
@@ -168,7 +168,7 @@ namespace PresentationLayer.Controllers
 				.OrderBy(c => c.CategoryName)
 				.ToList();
 
-			ViewBag.Tables = await _tableService.GetAllTablesAsync();
+			ViewBag.Tables = await _tableService.GetAvailableTablesAsync();
 		}
 
 		public async Task<IActionResult> Details(string id)

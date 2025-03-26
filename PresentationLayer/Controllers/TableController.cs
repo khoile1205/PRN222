@@ -56,7 +56,8 @@ namespace PresentationLayer.Controllers
             if (ModelState.IsValid)
             {
                 await _tableService.CreateTableAsync(table);
-                return RedirectToAction(nameof(Index));
+				TempData["SuccessMessage"] = "Table created successfully.";
+				return RedirectToAction(nameof(Index));
             }
 
             ViewBag.StatusList = new SelectList(Enum.GetValues(typeof(TableStatus)));
@@ -92,7 +93,8 @@ namespace PresentationLayer.Controllers
             if (ModelState.IsValid)
             {
                 await _tableService.UpdateTableAsync(table);
-                return RedirectToAction(nameof(Index));
+				TempData["SuccessMessage"] = "Table updated successfully.";
+				return RedirectToAction(nameof(Index));
             }
             ViewBag.StatusList = new SelectList(Enum.GetValues(typeof(TableStatus)));
             ViewBag.AreaList = new SelectList(Enum.GetValues(typeof(TableArea)));
@@ -129,11 +131,34 @@ namespace PresentationLayer.Controllers
             bool isDeleted = await _tableService.DeleteTableAsync(id);
             if (!isDeleted)
             {
-                TempData["ErrorMessage"] = "Cannot delete this table because it has been used.";
+                TempData["WarningMessage"] = "Cannot delete this table because it has been used. It has been marked as deleted.";
             }
             else
             {
                 TempData["SuccessMessage"] = "Table deleted successfully.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(string id)
+        {
+            var table = await _tableService.GetTableByIdAsync(id);
+            if (table == null)
+            {
+                TempData["ErrorMessage"] = "Table not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            bool isRestored = await _tableService.RestoreTableAsync(id);
+            if (!isRestored)
+            {
+                TempData["ErrorMessage"] = "Failed to restore table.";
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Table restored successfully.";
             }
 
             return RedirectToAction(nameof(Index));

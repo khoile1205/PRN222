@@ -51,10 +51,14 @@ namespace BussinessLayer.Services
         }
 
 
-
         public async Task<IEnumerable<Table>> GetAllTablesAsync()
         {
             return await _tableRepository.GetAllAsync();
+        }
+
+        public async Task<IEnumerable<Table>> GetAvailableTablesAsync()
+        {
+            return await _tableRepository.GetAllAsync(t => t.DeletedAt == null);
         }
 
         public async Task<Table?> GetTableByIdAsync(string id)
@@ -69,7 +73,6 @@ namespace BussinessLayer.Services
             {
                 tableExist.TableName = table.TableName;
                 tableExist.SeatQuantity = table.SeatQuantity;
-                tableExist.Status = table.Status;
                 tableExist.Area = table.Area;
                 tableExist.UpdatedAt = TimeHelper.GetVietnamTime();
 
@@ -77,6 +80,21 @@ namespace BussinessLayer.Services
             }
         }
 
+        public async Task<bool> RestoreTableAsync(string id)
+        {
+            var table = await _tableRepository.GetAsync(t => t.Id == id);
+            if (table == null) return false;
+
+            if (table.DeletedAt != null)
+            {
+                table.UpdatedAt = TimeHelper.GetVietnamTime();
+                table.DeletedAt = null;
+                await _tableRepository.UpdateAsync(table);
+                return true;
+            }
+
+            return false;
+        }
 
     }
 }

@@ -88,6 +88,10 @@
             if (error) {
                 toastr.error(error);
             }
+            var warning = '@TempData["WarningMessage"]';
+            if (warning) {
+                toastr.warning(warning);
+            }
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
