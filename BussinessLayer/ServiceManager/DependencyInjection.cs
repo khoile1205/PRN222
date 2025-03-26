@@ -53,6 +53,7 @@ namespace BussinessLayer.ServiceManager
 			services.AddScoped<IBeverageDetailService, BeverageDetailService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IRevenueService, RevenueService>();
+            services.AddScoped<ISalaryService, SalaryService>();
 
 			services.AddAutoMapper(typeof(DependencyInjection));
 
