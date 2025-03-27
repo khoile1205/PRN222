@@ -39,11 +39,11 @@ namespace BussinessLayer.ServiceManager
             #endregion
 
             #region Services
-
+            services.AddSingleton<IJwtService, JwtService>();
+            services.AddSingleton<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
-            services.AddSingleton<IJwtService, JwtService>();
-            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IBeverageService, BeverageService>();
             services.AddScoped<IBeverageCategoryService, BeverageCategoryService>();
             services.AddScoped<IBeverageSizeService, BeverageSizeService>();

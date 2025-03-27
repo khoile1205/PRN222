@@ -1,0 +1,76 @@
+<div id="upload-container">
+    <div class="d-flex ">
+        <div class="form-group flex-grow-1">
+            <input type="file" name="file" id="fileInput" class="form-control" accept="image/*" required>
+        </div>
+        <button type="button" class="btn btn-primary ms-3" id="uploadButton">Upload</button>
+        <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display: none;"></span>
+    </div>
+
+    <div id="uploadResult" style="margin-top: 10px;"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#uploadButton").click(function (event) {
+            event.preventDefault();
+
+            console.log("click")
+            var fileInput = $("#fileInput")[0];
+            if (!fileInput.files || fileInput.files.length === 0) {
+                toastr.error("Please select an image.");
+                return;
+            }
+
+            $("#uploadButton").prop("disabled", true);
+            $("#loadingSpinner").show();
+
+            var formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            $.ajax({
+                url: "/Upload/UploadImage", // Updated to match ImageController
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response && response.success) {
+                        var $form = $("form");
+                        var $imageUrlField = $form.find("input[name='ImageUrl']");
+                        var $previewContainer = $form.find("#currentImage");
+
+                        if ($imageUrlField.length) {
+                            $imageUrlField.val(response.imageUrl);
+                        } else {
+                            console.warn("ImageUrl input not found in the form.");
+                        }
+                        if ($previewContainer.length) {
+                            $previewContainer.html(
+                                `<img src="${response.imageUrl}" alt="New Beverage Image" style="max-width: 200px;" />`
+                            );
+                        } else {
+                            $("#uploadResult").html(
+                                `<img src="${response.imageUrl}" alt="Uploaded Image" style="max-width: 200px; display: block; margin-top: 10px;">`
+                            );
+                        }
+                        toastr.success("Image uploaded successfully!");
+
+                    } else {
+                        toastr.error(response.message || "Upload failed.");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    var errorMessage = xhr.responseJSON?.message || "An error occurred while uploading the image.";
+                    toastr.error(errorMessage);
+                },
+                complete: function () {
+                    $("#uploadButton").prop("disabled", false);
+                    $("#loadingSpinner").hide();
+                }
+            });
+        });
+    });
+</script>
