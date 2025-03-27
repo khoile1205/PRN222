@@ -4,6 +4,7 @@ using DataLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250326100729_RemoveTableStatus")]
+    partial class RemoveTableStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,7 +62,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Beverages", (string)null);
+                    b.ToTable("Beverages");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageCategory", b =>
@@ -86,7 +89,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BeverageCategories", (string)null);
+                    b.ToTable("BeverageCategories");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageDetail", b =>
@@ -120,7 +123,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("BeverageDetails", (string)null);
+                    b.ToTable("BeverageDetails");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageSize", b =>
@@ -143,7 +146,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BeverageSizes", (string)null);
+                    b.ToTable("BeverageSizes");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Inventory", b =>
@@ -184,7 +187,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Inventories", (string)null);
+                    b.ToTable("Inventories");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.InventoryCategory", b =>
@@ -207,7 +210,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryCategories", (string)null);
+                    b.ToTable("InventoryCategories");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.InventoryUpdateHistory", b =>
@@ -241,7 +244,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("InventoryUpdateHistories", (string)null);
+                    b.ToTable("InventoryUpdateHistories");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Role", b =>
@@ -264,7 +267,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Shift", b =>
@@ -299,7 +302,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shifts", (string)null);
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.ShiftStaff", b =>
@@ -336,7 +339,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("ShiftStaff", (string)null);
+                    b.ToTable("ShiftStaff");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Table", b =>
@@ -400,7 +403,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("TableDetailId");
 
-                    b.ToTable("TableBeverages", (string)null);
+                    b.ToTable("TableBeverages");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.TableDetail", b =>
@@ -429,7 +432,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("TableId");
 
-                    b.ToTable("TableDetails", (string)null);
+                    b.ToTable("TableDetails");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Transaction", b =>
@@ -467,7 +470,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("VoucherId");
 
-                    b.ToTable("Transactions", null, t =>
+                    b.ToTable("Transactions", t =>
                         {
                             t.HasCheckConstraint("CHK_PaymentType", "PaymentType IN ('Cashing', 'Card')");
                         });
@@ -532,7 +535,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Voucher", b =>
@@ -574,7 +577,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vouchers", (string)null);
+                    b.ToTable("Vouchers");
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Beverage", b =>
