@@ -38,7 +38,7 @@ namespace BussinessLayer.Services
                 DateTime startOfMonth = DateTimeHelper.GetStartOfMonth(month, year);
                 DateTime endOfMonth = DateTimeHelper.GetEndOfMonth(month, year);
 
-                var existingStaff = await _userRepository.GetAsync(u => u.Id == staffId);
+                var existingStaff = await _userRepository.GetAsync(u => u.Id == staffId, includes: q => q.Include(u => u.Role));
                 if (existingStaff == null)
                 {
                     throw new Exception("Staff member not found");
