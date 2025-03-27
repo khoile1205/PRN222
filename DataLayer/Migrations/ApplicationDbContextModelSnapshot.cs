@@ -59,7 +59,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Beverages");
+                    b.ToTable("Beverages", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageCategory", b =>
@@ -86,7 +86,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BeverageCategories");
+                    b.ToTable("BeverageCategories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageDetail", b =>
@@ -120,7 +120,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("SizeId");
 
-                    b.ToTable("BeverageDetails");
+                    b.ToTable("BeverageDetails", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.BeverageSize", b =>
@@ -143,7 +143,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BeverageSizes");
+                    b.ToTable("BeverageSizes", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Inventory", b =>
@@ -184,7 +184,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Inventories");
+                    b.ToTable("Inventories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.InventoryCategory", b =>
@@ -207,7 +207,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryCategories");
+                    b.ToTable("InventoryCategories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.InventoryUpdateHistory", b =>
@@ -241,7 +241,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("InventoryId");
 
-                    b.ToTable("InventoryUpdateHistories");
+                    b.ToTable("InventoryUpdateHistories", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Role", b =>
@@ -264,7 +264,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Shift", b =>
@@ -299,7 +299,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shifts");
+                    b.ToTable("Shifts", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.ShiftStaff", b =>
@@ -336,7 +336,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("StaffId");
 
-                    b.ToTable("ShiftStaff");
+                    b.ToTable("ShiftStaff", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Table", b =>
@@ -400,7 +400,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("TableDetailId");
 
-                    b.ToTable("TableBeverages");
+                    b.ToTable("TableBeverages", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.TableDetail", b =>
@@ -429,7 +429,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("TableId");
 
-                    b.ToTable("TableDetails");
+                    b.ToTable("TableDetails", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Transaction", b =>
@@ -467,7 +467,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("VoucherId");
 
-                    b.ToTable("Transactions", t =>
+                    b.ToTable("Transactions", null, t =>
                         {
                             t.HasCheckConstraint("CHK_PaymentType", "PaymentType IN ('Cashing', 'Card')");
                         });
@@ -532,7 +532,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Voucher", b =>
@@ -574,7 +574,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Vouchers");
+                    b.ToTable("Vouchers", (string)null);
                 });
 
             modelBuilder.Entity("DataLayer.Entities.Beverage", b =>
