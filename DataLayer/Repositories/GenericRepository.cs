@@ -14,8 +14,6 @@ namespace DataLayer.Repositories
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _context;
-        private IDbContextTransaction? _transaction;
-
         internal DbSet<T> _dbSet;
 
         public GenericRepository(ApplicationDbContext context)
