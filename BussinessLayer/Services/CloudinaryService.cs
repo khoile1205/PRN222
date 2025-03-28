@@ -24,7 +24,8 @@ namespace BussinessLayer.Services
             var uploadParams = new ImageUploadParams
             {
                 File = new FileDescription(Guid.NewGuid().ToString(), fileStream),
-                Folder = pathName
+                Folder = pathName,
+                Transformation = new Transformation().Width(300).Height(300).Crop("fill")
             };
 
             var uploadResult = await _cloudinary.UploadAsync(uploadParams);

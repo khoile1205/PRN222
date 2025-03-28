@@ -9,5 +9,6 @@ namespace BussinessLayer.Services.Abstraction
         Task<IEnumerable<Beverage>> GetAllBeverages();
         Task UpdateBeverage(UpdateBeverageDTO updateBeverageDTO);
         Task<bool> DeleteBeverage(string id);
+        Task<Beverage> GetBeverageById(string id);
     }
 }

@@ -1,7 +1,7 @@
 <div id="upload-container">
     <div class="d-flex ">
         <div class="form-group flex-grow-1">
-            <input type="file" name="file" id="fileInput" class="form-control" accept="image/*" required>
+            <input type="file" name="file" id="fileInput" class="form-control" accept="image/*">
         </div>
         <button type="button" class="btn btn-primary ms-3" id="uploadButton">Upload</button>
         <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display: none;"></span>
@@ -17,10 +17,8 @@
         $("#uploadButton").click(function (event) {
             event.preventDefault();
 
-            console.log("click")
             var fileInput = $("#fileInput")[0];
             if (!fileInput.files || fileInput.files.length === 0) {
-                toastr.error("Please select an image.");
                 return;
             }
 
@@ -72,5 +70,6 @@
                 }
             });
         });
+
     });
 </script>
