@@ -49,13 +49,13 @@ namespace BussinessLayer.ServiceManager
             services.AddScoped<IBeverageSizeService, BeverageSizeService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<ITableService, TableService>();
-			services.AddScoped<ITableDetailService, TableDetailService>();
-			services.AddScoped<IBeverageDetailService, BeverageDetailService>();
+            services.AddScoped<ITableDetailService, TableDetailService>();
+            services.AddScoped<IBeverageDetailService, BeverageDetailService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IRevenueService, RevenueService>();
             services.AddScoped<ISalaryService, SalaryService>();
 
-			services.AddAutoMapper(typeof(DependencyInjection));
+            services.AddAutoMapper(typeof(DependencyInjection));
 
 
             #endregion

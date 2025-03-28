@@ -1,6 +1,7 @@
 ﻿using DataLayer.Entities;
 using DataLayer.Repositories.Abstraction;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace DataLayer.Repositories
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         protected readonly ApplicationDbContext _context;
+        private IDbContextTransaction? _transaction;
+
         internal DbSet<T> _dbSet;
 
         public GenericRepository(ApplicationDbContext context)
