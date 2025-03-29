@@ -1,5 +1,7 @@
-﻿ using BussinessLayer.Services.Abstraction;
+﻿using BussinessLayer.Helper;
+using BussinessLayer.Services.Abstraction;
 using DataLayer.Entities;
+using DataLayer.Enums;
 using DataLayer.Repositories.Abstraction;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -39,5 +41,19 @@ namespace BussinessLayer.Services
         {
             await _userRepository.UpdateAsync(user);
         }
+
+        public async Task UpdateUserProfile(string userId, string name, string phoneNumber, Gender gender)
+        {
+            var existingUser = await _userRepository.GetAsync(u => u.Id == userId);
+            if (existingUser == null) throw new Exception("User not found");
+
+            existingUser.Name = name;
+            existingUser.PhoneNumber = phoneNumber;
+            existingUser.Gender = gender;
+            existingUser.UpdatedAt = TimeHelper.GetVietnamTime();
+
+            await _userRepository.UpdateAsync(existingUser);
+        }
+
     }
 }
