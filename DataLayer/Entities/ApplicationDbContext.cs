@@ -63,12 +63,7 @@ namespace DataLayer.Entities
                 .WithMany(t => t.TableDetails)
                 .HasForeignKey(td => td.TableId);
 
-            modelBuilder.Entity<Table>()
-              .Property(r => r.Status)
-              .HasConversion<string>();
-
-            modelBuilder.Entity<Table>()
-                .ToTable(t => t.HasCheckConstraint("CHK_Status", "Status IN ('InUse', 'Available')"));
+            
 
             modelBuilder.Entity<Table>()
               .Property(r => r.Area)

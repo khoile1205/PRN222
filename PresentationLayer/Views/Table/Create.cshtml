@@ -1,0 +1,75 @@
+﻿@model DataLayer.Entities.Table
+
+@{
+    ViewData["Title"] = "Create Table";
+}
+
+<style>
+    .form-card {
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .form-control-limited {
+        max-width: 570px;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="card form-card shadow">
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0"><i class="fa fa-table"></i> Create New Table</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="text-secondary"><i class="fa fa-info-circle"></i> Table Information</h5>
+                        <div class="form-group">
+                            <label asp-for="TableName" class="control-label"></label>
+                            <input asp-for="TableName" class="form-control form-control-limited" placeholder="Enter table name" />
+                            <span asp-validation-for="TableName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="SeatQuantity" class="control-label"></label>
+                            <input asp-for="SeatQuantity" type="number" class="form-control form-control-limited" placeholder="Enter seat quantity" />
+                            <span asp-validation-for="SeatQuantity" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="text-secondary"><i class="fa fa-map-marker"></i> Table Location</h5>
+                        <div class="form-group">
+                            <label asp-for="Area" class="control-label"></label>
+                            <select asp-for="Area" class="form-control form-control-limited" asp-items="ViewBag.AreaList">
+                                <option value="">Select Area</option>
+                            </select>
+                            <span asp-validation-for="Area" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <!-- Nút Back bên trái, nút Create căn giữa trên cùng 1 hàng -->
+                    <div class="col-2 text-left">
+                        <a asp-action="Index" class="btn btn-warning" style="width: 80px;">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>
+                    </div>
+                    <div class="col-8 text-center">
+                        <input type="submit" value="Create" class="btn btn-success" style="width: 100px;" />
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

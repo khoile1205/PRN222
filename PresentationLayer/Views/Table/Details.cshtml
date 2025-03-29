@@ -1,0 +1,45 @@
+﻿@model DataLayer.Entities.Table
+
+@{
+    ViewData["Title"] = "Table Details";
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0">Table Details</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <tr>
+                    <th style="width: 30%;">Table Name</th>
+                    <td>@Html.DisplayFor(model => model.TableName)</td>
+                </tr>
+                <tr>
+                    <th>Seat Quantity</th>
+                    <td>@Html.DisplayFor(model => model.SeatQuantity)</td>
+                </tr>
+                <tr>
+                    <th>Area</th>
+                    <td>@Html.DisplayFor(model => model.Area)</td>
+                </tr>
+                <tr>
+                    <th>Updated At</th>
+                    <td>@Model.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                </tr>
+                @* <tr>
+                    <th>Deleted At</th>
+                    <td>@(Model.DeletedAt.HasValue ? Model.DeletedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") : "N/A")</td>
+                </tr> *@
+            </table>
+        </div>
+        <div class="card-footer text-center">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-info">
+                <i class="fa fa-edit"></i> Edit
+            </a>
+            <a asp-action="Index" class="btn btn-secondary ml-2">
+                <i class="fa fa-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>

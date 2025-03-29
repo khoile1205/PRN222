@@ -1,32 +1,25 @@
 ﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Login";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-lg p-4">
-                <h2 class="text-center mb-4">Login</h2>
+<link rel="stylesheet" href="~/css/login.css" />
 
-                @if (!string.IsNullOrEmpty(ViewBag.Message))
-                {
-                    <div class="alert alert-danger text-center">@ViewBag.Message</div>
-                }
+<div class="login-wrapper">
+    <h1>Caffein Shop</h1>
 
-                <form method="post" asp-action="Login">
-                    <div class="mb-3">
-                        <label class="form-label">Username:</label>
-                        <input type="text" name="Username" class="form-control" required />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password:</label>
-                        <input type="password" name="Password" class="form-control" required />
-                    </div>
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                </form>
+    <div class="login-container">
+        <h2>Login</h2>
+        @if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert" role="alert">
+                @ViewBag.Message
             </div>
-        </div>
+        }
+        <form method="post" asp-action="Login">
+            <input type="text" name="Username" placeholder="Enter username" required />
+            <input type="password" name="Password" placeholder="Enter password" required />
+            <button type="submit" class="btn-submit">Login</button>
+        </form>
     </div>
 </div>

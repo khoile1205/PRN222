@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using BussinessLayer.Authentication;
 using AutoMapper;
+using System.ComponentModel;
 
 namespace BussinessLayer.ServiceManager
 {
@@ -40,18 +41,18 @@ namespace BussinessLayer.ServiceManager
             #endregion
 
             #region Services
-
+            services.AddSingleton<IJwtService, JwtService>();
+            services.AddSingleton<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
-            services.AddSingleton<IJwtService, JwtService>();
-            services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IBeverageService, BeverageService>();
             services.AddScoped<IBeverageCategoryService, BeverageCategoryService>();
             services.AddScoped<IBeverageSizeService, BeverageSizeService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<ITableService, TableService>();
-			services.AddScoped<ITableDetailService, TableDetailService>();
-			services.AddScoped<IBeverageDetailService, BeverageDetailService>();
+            services.AddScoped<ITableDetailService, TableDetailService>();
+            services.AddScoped<IBeverageDetailService, BeverageDetailService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IRevenueService, RevenueService>();
             services.AddScoped<IShiftService, ShiftService>();

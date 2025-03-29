@@ -9,6 +9,7 @@ namespace BussinessLayer.Services
 {
     public class BeverageService : IBeverageService
     {
+        private readonly ApplicationDbContext _context;
         private readonly IGenericRepository<Beverage> _beverageRepository;
         private readonly IGenericRepository<BeverageDetail> _beverageDetailRepository;
         private readonly IMapper _mapper;
@@ -16,57 +17,67 @@ namespace BussinessLayer.Services
         public BeverageService(
            IGenericRepository<Beverage> beverageRepository,
            IGenericRepository<BeverageDetail> beverageDetailRepository,
+           ApplicationDbContext context,
            IMapper mapper)
         {
             _beverageRepository = beverageRepository;
             _beverageDetailRepository = beverageDetailRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task CreateAsync(CreateBeverageDTO createBeverageDTO)
         {
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                var existedBeverage = await _beverageRepository.GetAsync(
-                    b => b.Name == createBeverageDTO.Name,
-                    includes: b => b.Include(b => b.BeverageDetails).ThenInclude(bd => bd.Size)
-                );
-
-                if (existedBeverage == null)
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    var beverage = _mapper.Map<Beverage>(createBeverageDTO);
-                    await _beverageRepository.CreateAsync(beverage);
+                    var existedBeverage = await _beverageRepository.GetAsync(
+                        b => b.Name == createBeverageDTO.Name,
+                        includes: b => b.Include(b => b.BeverageDetails).ThenInclude(bd => bd.Size)
+                    );
 
-                    var beverageDetail = _mapper.Map<BeverageDetail>(createBeverageDTO);
-                    beverageDetail.BeverageId = beverage.Id;
-                    await _beverageDetailRepository.CreateAsync(beverageDetail);
-                }
-                else
-                {
-                    var existedBeverageSize = existedBeverage.BeverageDetails
-                        .FirstOrDefault(bd => bd.SizeId == createBeverageDTO.SizeId);
-
-                    if (existedBeverageSize == null)
+                    if (existedBeverage == null)
                     {
-                        var beverageDetail = _mapper.Map<BeverageDetail>(createBeverageDTO);
-                        beverageDetail.BeverageId = existedBeverage.Id;
-                        await _beverageDetailRepository.CreateAsync(beverageDetail);
+                        var beverage = _mapper.Map<Beverage>(createBeverageDTO);
+                        await _beverageRepository.CreateAsync(beverage);
                     }
                     else
                     {
-                        throw new InvalidOperationException("Beverage already exists with the same size.");
-                    }
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new Exception($"Validation Error: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unexpected error occurred while creating the beverage.", ex);
-            }
+                        var existedSizeMap = existedBeverage.BeverageDetails.ToDictionary(d => d.SizeId, d => d.Size.SizeName);
+                        var duplicateSizeMap = createBeverageDTO.Details
+                            .Where(d => existedSizeMap.ContainsKey(d.SizeId))
+                            .Select(d => existedSizeMap[d.SizeId])
+                            .ToList();
 
+                        if (duplicateSizeMap.Any())
+                        {
+                            throw new InvalidOperationException($"Beverage already exists with sizes: {string.Join(", ", duplicateSizeMap)}.");
+                        }
+
+                        foreach (var detailDTO in createBeverageDTO.Details)
+                        {
+                            var beverageDetail = _mapper.Map<BeverageDetail>(detailDTO);
+                            beverageDetail.BeverageId = existedBeverage.Id;
+                            await _beverageDetailRepository.CreateAsync(beverageDetail);
+                        }
+                    }
+
+                    await transaction.CommitAsync();
+                }
+                catch (InvalidOperationException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception($"Validation Error: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception("An unexpected error occurred while creating the beverage.", ex);
+                }
+            });
         }
 
         public async Task<bool> DeleteBeverage(string id)
@@ -108,63 +119,94 @@ namespace BussinessLayer.Services
             );
         }
 
+        public async Task<Beverage> GetBeverageById(string beverageId)
+        {
+            return await _beverageRepository.GetAsync(s => s.Id == beverageId,
+                includes:
+                    b => b.Include(b => b.BeverageDetails)
+                    .ThenInclude(bd => bd.Size)
+                    .Include(b => b.BeverageCategory)
+            );
+        }
+
         public async Task UpdateBeverage(UpdateBeverageDTO updateBeverageDTO)
         {
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                if (string.IsNullOrEmpty(updateBeverageDTO.Id))
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    throw new ArgumentException("Beverage ID is required.");
-                }
-
-                var beverage = await _beverageRepository.GetAsync(b => b.Id == updateBeverageDTO.Id);
-                if (beverage == null)
-                {
-                    throw new KeyNotFoundException("Beverage not found.");
-                }
-
-                beverage.Name = updateBeverageDTO.Name;
-                beverage.Image = updateBeverageDTO.ImageUrl;
-                beverage.Description = updateBeverageDTO.Description;
-                beverage.UpdatedAt = DateTime.Now;
-
-                await _beverageRepository.UpdateAsync(beverage);
-
-                var beverageDetail = await _beverageDetailRepository.GetAsync(bd => bd.BeverageId == updateBeverageDTO.Id);
-                if (beverageDetail == null)
-                {
-                    beverageDetail = new BeverageDetail
+                    if (string.IsNullOrEmpty(updateBeverageDTO.Id))
                     {
-                        Id = Guid.NewGuid().ToString(),
-                        BeverageId = updateBeverageDTO.Id,
-                        SizeId = updateBeverageDTO.SizeId ?? string.Empty,
-                        Price = updateBeverageDTO.Price,
-                        CreatedAt = DateTime.Now
-                    };
+                        throw new ArgumentException("Beverage ID is required.");
+                    }
 
-                    await _beverageDetailRepository.CreateAsync(beverageDetail);
+                    if (updateBeverageDTO.Details == null || !updateBeverageDTO.Details.Any())
+                    {
+                        throw new ArgumentException("At least one size and price is required.");
+                    }
+
+                    var beverage = await _beverageRepository.GetAsync(
+                        b => b.Id == updateBeverageDTO.Id,
+                        includes: b => b.Include(b => b.BeverageDetails)
+                    );
+                    if (beverage == null)
+                    {
+                        throw new KeyNotFoundException("Beverage not found.");
+                    }
+
+                    beverage.Name = updateBeverageDTO.Name;
+                    beverage.CategoryId = updateBeverageDTO.CategoryId;
+                    beverage.Image = updateBeverageDTO.ImageUrl;
+                    beverage.Description = updateBeverageDTO.Description;
+                    beverage.UpdatedAt = DateTime.UtcNow;
+
+                    var existingDetails = beverage.BeverageDetails.ToList();
+                    foreach (var detailDto in updateBeverageDTO.Details)
+                    {
+                        var existingDetail = existingDetails.FirstOrDefault(d => d.SizeId == detailDto.SizeId);
+                        if (existingDetail != null)
+                        {
+                            existingDetail.Price = detailDto.Price;
+                            await _beverageDetailRepository.UpdateAsync(existingDetail);
+                        }
+                        else
+                        {
+                            var newDetail = _mapper.Map<BeverageDetail>(detailDto);
+                            newDetail.BeverageId = beverage.Id;
+                            await _beverageDetailRepository.CreateAsync(newDetail);
+                            beverage.BeverageDetails.Add(newDetail);
+                        }
+                    }
+
+                    foreach (var existingDetail in existingDetails)
+                    {
+                        if (!updateBeverageDTO.Details.Any(d => d.SizeId == existingDetail.SizeId))
+                        {
+                            await _beverageDetailRepository.RemoveAsync(existingDetail);
+                        }
+                    }
+
+                    await _beverageRepository.UpdateAsync(beverage);
+                    await transaction.CommitAsync();
                 }
-                else
+                catch (ArgumentException ex)
                 {
-                    beverageDetail.SizeId = updateBeverageDTO.SizeId ?? string.Empty;
-                    beverageDetail.Price = updateBeverageDTO.Price;
-                    beverageDetail.UpdatedAt = DateTime.Now;
-
-                    await _beverageDetailRepository.UpdateAsync(beverageDetail);
+                    await transaction.RollbackAsync();
+                    throw new Exception($"Validation Error: {ex.Message}");
                 }
-            }
-            catch (ArgumentException ex)
-            {
-                throw new Exception($"Validation Error: {ex.Message}");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                throw new Exception($"Not Found: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unexpected error occurred while updating the beverage.", ex);
-            }
+                catch (KeyNotFoundException ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception($"Not Found: {ex.Message}");
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception("An unexpected error occurred while updating the beverage.", ex);
+                }
+            });
         }
     }
 }

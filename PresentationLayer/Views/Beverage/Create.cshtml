@@ -1,54 +1,152 @@
 ﻿@model PresentationLayer.Models.BeverageViewModel
+@{
+    ViewData["Title"] = "Create Beverage";
+}
+<style>
+    .form-card {
+        max-width: 500px;
+        margin: auto;
+    }
 
-<h2>Create Beverage</h2>
+    .form-control-limited {
+        max-width: 470px;
+    }
+</style>
+<div class="container mt-5">
+    <div class="card form-card shadow">
+        <div class="card-header bg-dark text-white">
+            <h2 class="mb-0">Create Beverage</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control form-control-limited" placeholder="Enter beverage name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
 
-<form asp-action="Create" method="post">
-    @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="control-label">Category</label>
+                    <select asp-for="CategoryId" class="form-control form-control-limited"
+                            asp-items="@(new SelectList(ViewBag.Categories, "Value", "Text"))">
+                        <option value="">Select Category</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
 
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="form-group">
+                    <label class="control-label">Sizes & Prices</label>
+                    <div id="sizePriceContainer">
+                        @if (Model?.Details?.Any() == true)
+                        {
+                            for (int i = 0; i < Model.Details.Count; i++)
+                            {
+                                <div class="size-price-row row mb-2">
+                                    <div class="col">
+                                        <label asp-for="Details[i].SizeId">Size</label>
+                                        <select asp-for="Details[i].SizeId"
+                                                asp-items="@(new SelectList(ViewBag.Sizes, "Value", "Text"))"
+                                                class="form-control form-control-limited size-select"></select>
+                                        <span asp-validation-for="Details[i].SizeId" class="text-danger"></span>
+                                    </div>
+                                    <div class="col">
+                                        <label asp-for="Details[i].Price">Price</label>
+                                        <input asp-for="Details[i].Price" type="number" step="0.01"
+                                               class="form-control form-control-limited size-select" />
+                                        <span asp-validation-for="Details[i].Price" class="text-danger"></span>
+                                    </div>
+                                    <div class="col">
+                                        <button type="button" class="btn btn-danger remove-row">Remove</button>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <button type="button" id="addSizePrice" class="btn btn-secondary mt-2">Add Size & Price</button>
+                    <span asp-validation-for="Details" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control form-control-limited" placeholder="Enter description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ImageUrl" class="control-label">Upload Image</label>
+                    <input asp-for="ImageUrl" class="form-control form-control-limited" id="imageUrl" readonly placeholder="Image URL" />
+                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <partial name="_UploadImagePartial" />
+                </div>
+
+                <div class="form-group text-center mt-4">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <a asp-action="Index" class="btn btn-secondary ml-2">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="CategoryId"></label>
-        <select asp-for="CategoryId" class="form-control" asp-items="@(new SelectList(ViewBag.Categories, "Id", "CategoryName"))">
-            <option value="">Select Category</option>
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="SizeId"></label>
-        <select asp-for="SizeId" class="form-control" asp-items="@(new SelectList(ViewBag.Sizes, "Id", "Size"))">
-            <option value="">Select Size</option>
-        </select>
-        <span asp-validation-for="SizeId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Price"></label>
-        <input asp-for="Price" class="form-control" step="0.01" />
-        <span asp-validation-for="Price" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Description"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="ImageUrl"></label>
-        <input asp-for="ImageUrl" class="form-control" />
-        <span asp-validation-for="ImageUrl" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var sizeOptions = JSON.parse('@Html.Raw(Json.Serialize(ViewBag.Sizes))');
+            var index = @(Model?.Details?.Count ?? 0);
+
+            function getSelectedSizeIds() {
+                return $('.size-select').map(function () {
+                    return $(this).val();
+                }).get();
+            }
+
+            function getAvailableSizes() {
+                var selectedIds = getSelectedSizeIds();
+                return sizeOptions.filter(function (size) {
+                    return !selectedIds.includes(size.Value);
+                });
+            }
+
+            $("#addSizePrice").click(function () {
+                var availableSizes = getAvailableSizes();
+
+                if (availableSizes.length === 0) {
+                    alert("No more sizes available to add.");
+                    return;
+                }
+
+                var newBeverageSizeHtml = `
+                                    <div class="size-price-row row mb-2">
+                                        <div class="col">
+                                            <select name="Details[${index}].SizeId" class="form-control size-select">
+                                                ${availableSizes.map(s => `<option value="${s.Value}">${s.Text}</option>`).join('')}
+                                            </select>
+                                            <span class="text-danger" data-valmsg-for="Details[${index}].SizeId" data-valmsg-replace="true"></span>
+                                        </div>
+                                        <div class="col">
+                                            <input name="Details[${index}].Price" class="form-control" type="number" step="0.01" min="0.01" data-val="true" data-val-required="Price is required." data-val-range="Price must be greater than 0." data-val-range-min="0.01" data-val-range-max="${Number.MAX_VALUE}" />
+                                            <span class="text-danger" data-valmsg-for="Details[${index}].Price" data-valmsg-replace="true"></span>
+                                        </div>
+                                        <div class="col">
+                                            <button type="button" class="btn btn-danger remove-row">Remove</button>
+                                        </div>
+                                    </div>`;
+                $("#sizePriceContainer").append(newBeverageSizeHtml);
+                index++;
+            });
+
+            $(document).on("click", ".remove-row", function () {
+                $(this).closest(".size-price-row").remove();
+            });
+        });
+    </script>
     <partial name="_ValidationScriptsPartial" />
+
 }
