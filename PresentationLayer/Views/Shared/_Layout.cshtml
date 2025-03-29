@@ -70,6 +70,16 @@
 											<i class="fa fa-chart-line"></i> Revenue
 										</a>
 									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="ShiftCalendar">
+											<i class="fa fa-calendar"></i> Shifts Calendar
+										</a>
+									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="ApproveRequests">
+											<i class="fa-solid fa-table"></i> Approve Requests
+										</a>
+									</li>
 								</ul>
 							</li>
 						}
@@ -91,6 +101,21 @@
 											<i class="fa-solid fa-money-bill"></i> Salary
 										</a>
 									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="Index">
+											<i class="fa-solid fa-table"></i> View fixed shifts
+										</a>
+									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="RequestShift">
+											<i class="fa fa-tasks "></i> Request Shifts
+										</a>
+									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="MyRequests">
+											<i class="fa fa-list "></i> My Requests
+										</a>
+									</li>
 								</ul>
 							</li>
 						}
@@ -99,10 +124,13 @@
 					<ul class="navbar-nav">
 						@if (User.Identity?.IsAuthenticated == true)
 						{
+
 							<li class="nav-item d-flex align-items-center me-3">
-								<span class="navbar-text fw-bold">
-									<i class="fa fa-user"></i> Hello @username
-								</span>
+								<a asp-controller="Users" asp-action="Profile" class="nav-link d-flex align-items-center">
+									<span class="navbar-text fw-bold">
+										<i class="fa fa-user"></i> Hello @username
+									</span>
+								</a>
 							</li>
 							<li class="nav-item">
 								<form method="post" asp-action="Logout" asp-controller="Auth">
