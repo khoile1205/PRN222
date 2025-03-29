@@ -35,7 +35,8 @@ namespace BussinessLayer.ServiceManager
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped(typeof(IPaginationRepository<>), typeof(PaginationRepository<>));
-
+            services.AddScoped<IShiftRepository, ShiftRepository>();
+            services.AddScoped<IShiftStaffRepository, ShiftStaffRepository>();
             #endregion
 
             #region Services
@@ -53,9 +54,11 @@ namespace BussinessLayer.ServiceManager
 			services.AddScoped<IBeverageDetailService, BeverageDetailService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IRevenueService, RevenueService>();
+            services.AddScoped<IShiftService, ShiftService>();
+            services.AddScoped<IShiftStaffService, ShiftStaffService>();
             services.AddScoped<ISalaryService, SalaryService>();
 
-			services.AddAutoMapper(typeof(DependencyInjection));
+            services.AddAutoMapper(typeof(DependencyInjection));
 
 
             #endregion

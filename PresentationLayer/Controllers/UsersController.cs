@@ -14,6 +14,7 @@ using PresentationLayer.ViewModel;
 using BussinessLayer.Services.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 using Shared.Enums;
+using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
@@ -206,6 +207,85 @@ namespace PresentationLayer.Controllers
             TempData["SuccessMessage"] = "User restored successfully!";
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> Profile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var user = await userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        [HttpGet("Users/EditProfile")]
+        public async Task<IActionResult> EditProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var user = await userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+                                        .Cast<Gender>()
+                                        .Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name", (int)user.Gender);
+
+            return View(user);
+        }
+
+        [HttpPost("Users/EditProfile")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile([Bind("Id,Name,PhoneNumber,Email,Gender")] User user)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null || userId != user.Id)
+            {
+                return Unauthorized();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var existingUser = await userService.GetUserById(userId);
+                    if (existingUser == null) return NotFound();
+
+                    // Only update allowed fields
+                    existingUser.Name = user.Name;
+                    existingUser.PhoneNumber = user.PhoneNumber;
+                    existingUser.Email = user.Email;
+                    existingUser.Gender = user.Gender;
+                    existingUser.UpdatedAt = TimeHelper.GetVietnamTime();
+
+                    await userService.UpdateUser(existingUser);
+
+                    TempData["SuccessMessage"] = "Profile updated successfully!";
+                    return RedirectToAction("Profile");
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    TempData["ErrorMessage"] = "Data has been changed, please try again!";
+                }
+            }
+
+            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+                .Cast<Gender>().Select(g => new { Id = (int)g, Name = g.ToString() }), "Id", "Name", (int)user.Gender);
+
+            return View(user);
         }
 
     }

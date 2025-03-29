@@ -28,7 +28,9 @@ namespace BussinessLayer.Services
         {
             try
             {
-                User existingUser = await _userRepository.GetAsync(u => u.UserName == loginRequestDTO.Username || u.Email == loginRequestDTO.Username, includes: (q) => q.Include(u => u.Role));
+                User existingUser = await _userRepository.GetAsync(
+                    u => u.UserName == loginRequestDTO.Username || u.Email == loginRequestDTO.Username,
+                    includes: (q) => q.Include(u => u.Role));
 
                 if (existingUser == null || !HashPasswordHelper.VerifyPassword(loginRequestDTO.Password, existingUser.Password))
                 {
@@ -37,9 +39,11 @@ namespace BussinessLayer.Services
 
                 var token = _jwtService.GenerateToken(existingUser.Id, existingUser.UserName, existingUser.Role.RoleName);
 
+                //Return AccessToken and UserId
                 return new LoginResponseDTO
                 {
-                    AccessToken = token
+                    AccessToken = token,
+                    UserId = existingUser.Id.ToString(),
                 };
             }
             catch (Exception ex)

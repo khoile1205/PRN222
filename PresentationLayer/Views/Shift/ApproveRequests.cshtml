@@ -1,0 +1,41 @@
+﻿@model IEnumerable<DataLayer.Entities.ShiftStaff>
+
+@{
+    ViewData["Title"] = "Approve Shift Requests";
+}
+
+<h2>Pending Shift Requests</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Staff Name</th>
+            <th>Shift Date</th>
+            <th>Shift</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var request in Model)
+        {
+            <tr>
+                <td>@request.Staff.Name</td>
+                <td>@request.ShiftDate.ToShortDateString()</td>
+                <td>@request.Shift.ShiftCode (@request.Shift.ShiftType)</td>
+                <td>@request.Status</td>
+                <td>
+                    <form asp-action="ApproveShift" method="post" style="display:inline;">
+                        <input type="hidden" name="requestId" value="@request.Id" />
+                        <button type="submit" class="btn btn-success">Approve</button>
+                    </form>
+
+                    <form asp-action="RejectShift" method="post" style="display:inline;">
+                        <input type="hidden" name="requestId" value="@request.Id" />
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

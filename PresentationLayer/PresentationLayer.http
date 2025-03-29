@@ -1,0 +1,32 @@
+﻿@PresentationLayer_HostAddress = https://localhost:7221
+
+GET {{PresentationLayer_HostAddress}}/auth/login/{id}
+
+###
+
+POST {{PresentationLayer_HostAddress}}/auth/login/{id}
+Content-Type: application/json
+
+{
+  Username: "staff01"
+  Password: "123456"
+}
+
+###
+
+GET {{PresentationLayer_HostAddress}}/users/profile/{4
+}
+
+###
+
+GET {{PresentationLayer_HostAddress}}/users/editprofile/{4}
+
+###
+
+GET {{PresentationLayer_HostAddress}}/auth/login/{id}
+
+###
+
+GET {{PresentationLayer_HostAddress}}/shift/index/{1}
+
+###

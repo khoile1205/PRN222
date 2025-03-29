@@ -1,0 +1,34 @@
+﻿.profile-container {
+    display: flex;
+    gap: 150px;
+    align-items: center;
+    margin-top: 40px;
+    flex-wrap: wrap; /* Mobile responsiveness */
+}
+
+.avatar-frame {
+    width: 350px;
+    height: 350px;
+    border: 3px solid #ccc;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #f8f9fa;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.info-container h3 {
+    margin-bottom: 15px;
+}
+
+.info-container p {
+    margin: 6px 0;
+}

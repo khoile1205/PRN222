@@ -1,0 +1,118 @@
+﻿@model DataLayer.Entities.User
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" />
+}
+
+<h2>Edit Profile</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<div class="profile-container">
+    <div class="avatar-frame">
+        <img src="@(string.IsNullOrEmpty(Model.Avatar) ? Url.Content("~/images/default-avatar.png") : Model.Avatar)"
+             alt="Avatar"
+             class="avatar-img" />
+    </div>
+
+    <div class="info-container">
+        <form id="editProfileForm" asp-action="EditProfile" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Gender" class="control-label"></label>
+                <select asp-for="Gender" class="form-control" asp-items="ViewBag.GenderList"></select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-action="Profile" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Unsaved Changes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                You have unsaved changes. Do you want to save them before leaving?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveChanges">Save</button>
+                <button type="button" class="btn btn-danger" id="discardChanges">Discard</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let form = $('#editProfileForm');
+            let originalData = form.serialize();
+            let isFormDirty = false;
+
+            form.on('change input', function () {
+                isFormDirty = form.serialize() !== originalData;
+            });
+
+            $('a[href]').not('[asp-action="EditProfile"]').on('click', function (e) {
+                if (isFormDirty) {
+                    e.preventDefault();
+                    $('#confirmModal').modal('show');
+                    $('#confirmModal').data('targetUrl', $(this).attr('href'));
+                }
+            });
+
+            $('#saveChanges').on('click', function () {
+                form.submit();
+            });
+
+            $('#discardChanges').on('click', function () {
+                isFormDirty = false;
+                let targetUrl = $('#confirmModal').data('targetUrl');
+                window.location.href = targetUrl || '@Url.Action("Profile")';
+            });
+
+            form.on('submit', function () {
+                isFormDirty = false;
+            });
+        });
+    </script>
+}

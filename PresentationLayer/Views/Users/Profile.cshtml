@@ -1,0 +1,26 @@
+﻿@model DataLayer.Entities.User
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" />
+}
+
+<h2>User Profile</h2>
+
+<div class="profile-container">
+    <div class="avatar-frame">
+        <img src="@(string.IsNullOrEmpty(Model.Avatar) ? Url.Content("~/images/default-avatar.png") : Model.Avatar)"
+             alt="Avatar"
+             class="avatar-img" />
+    </div>
+    <div class="info-container">
+        <h3>@Model.Name</h3>
+        <p><strong>Username:</strong> @Model.UserName</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+        <p><strong>Gender:</strong> @(Model.Gender == 0 ? "Male" : "Female")</p>
+        <a asp-action="EditProfile" class="btn btn-primary">Edit Profile</a>
+    </div>
+</div>

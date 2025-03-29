@@ -1,0 +1,32 @@
+﻿@model DataLayer.Entities.ShiftStaff
+
+@{
+    ViewData["Title"] = "Request Shift";
+}
+
+<h2>Request a Shift</h2>
+
+<form asp-action="RequestShift" method="post">
+    <div class="mb-3">
+        <label for="ShiftDate" class="form-label">Shift Date:</label>
+        <input type="date" asp-for="ShiftDate" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label for="ShiftId" class="form-label">Select Shift:</label>
+        <select asp-for="ShiftId" class="form-control" asp-items="ViewBag.ShiftId"></select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Request</button>
+</form>
+<script>
+    window.onload = function () {
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // Set tomorrow
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const minDate = `${yyyy}-${mm}-${dd}`;
+        document.querySelector('input[name="ShiftDate"]').setAttribute('min', minDate);
+    }
+</script>
