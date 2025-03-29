@@ -25,7 +25,7 @@ namespace BussinessLayer.Services
         {
             if (!startTime.HasValue || !endTime.HasValue)
             {
-                (startTime, endTime) = GetDefaultDateRange(rangeType, startTime, endTime);
+                (startTime, endTime) = this.GetRevenueDateRange(rangeType, startTime, endTime);
             }
 
             var transactions = await _transactionRepository.GetAllAsync(t => t.CreatedAt >= startTime && t.CreatedAt <= endTime);
@@ -33,7 +33,7 @@ namespace BussinessLayer.Services
             return GroupRevenueByRangeType(transactions, rangeType, startTime.Value, endTime.Value);
         }
 
-        private (DateTime start, DateTime end) GetDefaultDateRange(RevenueRangeTypeEnum rangeType, DateTime? startTime, DateTime? endTime)
+        public (DateTime start, DateTime end) GetRevenueDateRange(RevenueRangeTypeEnum rangeType, DateTime? startTime, DateTime? endTime)
         {
             DateTime now = DateTime.UtcNow;
             DateTime defaultStart;

@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using BussinessLayer.Authentication;
 using AutoMapper;
+using System.ComponentModel;
 
 namespace BussinessLayer.ServiceManager
 {

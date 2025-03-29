@@ -56,6 +56,26 @@
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="submit" class="btn btn-primary mb-3">Apply Filter</button>
+                            <div class="dropdown mb-3 ms-2">
+                                <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                    Export to
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="@Url.Action("ExportToExcel", new { rangeType = ViewBag.RangeType, startTime = ViewBag.StartTime, endTime = ViewBag.EndTime })">
+                                            Excel
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           href="@Url.Action("ExportToCsv", new { rangeType = ViewBag.RangeType, startTime = ViewBag.StartTime, endTime = ViewBag.EndTime })">
+                                            CSV
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </form>
                 </div>
