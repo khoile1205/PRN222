@@ -42,6 +42,7 @@ namespace PresentationLayer.Controllers
                     new Claim("JWT", response.AccessToken)
                 };
 
+
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var authProperties = new AuthenticationProperties { IsPersistent = true };
 
@@ -59,6 +60,7 @@ namespace PresentationLayer.Controllers
                 });
 
                 TempData["SuccessMessage"] = "Login successfully";
+
 
                 return RedirectToAction("Index", "Home");
             }
@@ -79,6 +81,12 @@ namespace PresentationLayer.Controllers
             Response.Cookies.Delete("Token");
 
             return RedirectToAction("Login", "Auth");
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

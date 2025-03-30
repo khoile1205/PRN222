@@ -22,7 +22,7 @@ namespace PresentationLayer.Controllers
             }
 
             using var stream = file.OpenReadStream();
-            var imageUrl = await _cloudinaryService.UploadImage(stream, CloudinaryPathName.BEVERAGE);
+            var imageUrl = await _cloudinaryService.UploadImage(stream, CloudinaryPathName.MAIN_FOLDER);
 
             return Json(new { success = true, imageUrl });
         }

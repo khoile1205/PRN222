@@ -1,4 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Configuration;
@@ -8,13 +8,13 @@ using Shared.Enums;
 
 namespace BussinessLayer.Authentication
 {
-
     public interface IJwtService
     {
         public string GenerateToken(string userId, string username, RoleEnum role);
         public bool ValidateToken(string token);
         public ClaimsPrincipal? GetClaimsFromToken(string token);
     }
+
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
@@ -30,18 +30,20 @@ namespace BussinessLayer.Authentication
         {
             var jwtSecretKey = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
 
-            var claims = new List<Claim> {
+            var claims = new List<Claim>
+            {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
                 new Claim(JwtRegisteredClaimNames.UniqueName, username),
                 new Claim(ClaimTypes.Role, role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
             var token = new JwtSecurityToken(
-                   issuer: _configuration["Jwt:Issuer"],
-                   claims: claims,
-                   expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
-                   signingCredentials: new SigningCredentials(new SymmetricSecurityKey(jwtSecretKey), SecurityAlgorithms.HmacSha256)
-               );
+                issuer: _configuration["Jwt:Issuer"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:ExpireMinutes"])),
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(jwtSecretKey), SecurityAlgorithms.HmacSha256)
+            );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -60,6 +62,14 @@ namespace BussinessLayer.Authentication
                 {
                     claimsIdentity.AddClaim(new Claim("Name", identityName));
                 }
+
+                // Debugging log for claims
+                _logger.LogInformation("Extracted JWT claims:");
+                foreach (var claim in jwtToken.Claims)
+                {
+                    _logger.LogInformation($" - {claim.Type} : {claim.Value}");
+                }
+
                 return new ClaimsPrincipal(claimsIdentity);
             }
             catch (Exception ex)
@@ -92,7 +102,8 @@ namespace BussinessLayer.Authentication
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
-                return validatedToken is JwtSecurityToken jwtSecurityToken && jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
+                return validatedToken is JwtSecurityToken jwtSecurityToken &&
+                       jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase);
             }
             catch (Exception ex)
             {

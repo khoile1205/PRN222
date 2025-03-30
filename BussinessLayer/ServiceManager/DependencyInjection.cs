@@ -7,16 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using BussinessLayer.Authentication;
-using AutoMapper;
-using System.ComponentModel;
 
 namespace BussinessLayer.ServiceManager
 {
@@ -36,7 +30,6 @@ namespace BussinessLayer.ServiceManager
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped(typeof(IPaginationRepository<>), typeof(PaginationRepository<>));
-
             #endregion
 
             #region Services
@@ -54,6 +47,8 @@ namespace BussinessLayer.ServiceManager
             services.AddScoped<IBeverageDetailService, BeverageDetailService>();
             services.AddScoped<IVoucherService, VoucherService>();
             services.AddScoped<IRevenueService, RevenueService>();
+            services.AddScoped<IShiftService, ShiftService>();
+            services.AddScoped<IShiftStaffService, ShiftStaffService>();
             services.AddScoped<ISalaryService, SalaryService>();
 
             services.AddAutoMapper(typeof(DependencyInjection));
@@ -76,15 +71,35 @@ namespace BussinessLayer.ServiceManager
                         ValidAudience = configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.Redirect("/Auth/Login");
+                            return Task.CompletedTask;
+                        }
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnForbidden = context =>
+                        {
+                            context.Response.Redirect("/Auth/AccessDenied");
+                            return Task.CompletedTask;
+
+                        }
+                    };
                 })
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-            {
-                options.LoginPath = "/Auth/Login";
-                options.LogoutPath = "/Auth/Logout";
-                options.AccessDeniedPath = "/Auth/AccessDenied";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                options.SlidingExpiration = true;
-            });
+                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                 {
+                     options.LoginPath = "/Auth/Login";
+                     options.LogoutPath = "/Auth/Logout";
+                     options.AccessDeniedPath = "/Auth/AccessDenied";
+                     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                     options.SlidingExpiration = true;
+                 });
             services.AddAuthorization();
             #endregion
         }

@@ -1,4 +1,4 @@
-﻿@{
+﻿﻿@{
 	var username = User.Claims.FirstOrDefault(c => c.Type == "unique_name")?.Value ?? "User";
 }
 
@@ -46,6 +46,11 @@
 								</a>
 								<ul class="dropdown-menu" aria-labelledby="managementDropdown">
 									<li class="nav-item">
+										<a class="dropdown-item" asp-area="" asp-controller="Transaction" asp-action="Index">
+											<i class="fa-solid fa-table"></i> Transactions
+										</a>
+									</li>
+									<li class="nav-item">
 										<a class="dropdown-item" asp-area="" asp-controller="Table" asp-action="Index">
 											<i class="fa-solid fa-table"></i> Tables
 										</a>
@@ -70,6 +75,16 @@
 											<i class="fa fa-chart-line"></i> Revenue
 										</a>
 									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="ShiftCalendar">
+											<i class="fa fa-calendar"></i> Shifts Calendar
+										</a>
+									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="ApproveRequests">
+											<i class="fa-solid fa-table"></i> Approve Requests
+										</a>
+									</li>
 								</ul>
 							</li>
 						}
@@ -82,13 +97,18 @@
 								</a>
 								<ul class="dropdown-menu" aria-labelledby="staffManagementDropdown">
 									<li>
-										<a class="dropdown-item" asp-area="" asp-controller="Transaction" asp-action="Index">
-											<i class="fa-solid fa-file-invoice"></i> Transactions
+										<a class="dropdown-item" asp-area="" asp-controller="Salary" asp-action="Index">
+											<i class="fa-solid fa-money-bill"></i> Salary
 										</a>
 									</li>
 									<li>
-										<a class="dropdown-item" asp-area="" asp-controller="Salary" asp-action="Index">
-											<i class="fa-solid fa-money-bill"></i> Salary
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="RequestShift">
+											<i class="fa fa-tasks "></i> Request Shifts
+										</a>
+									</li>
+									<li>
+										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="MyRequests">
+											<i class="fa fa-list "></i> My Requests
 										</a>
 									</li>
 								</ul>
@@ -99,10 +119,13 @@
 					<ul class="navbar-nav">
 						@if (User.Identity?.IsAuthenticated == true)
 						{
+
 							<li class="nav-item d-flex align-items-center me-3">
-								<span class="navbar-text fw-bold">
-									<i class="fa fa-user"></i> Hello @username
-								</span>
+								<a asp-controller="Users" asp-action="Profile">
+									<span class="navbar-text fw-bold">
+										<i class="fa fa-user"></i> Hello @username
+									</span>
+								</a>
 							</li>
 							<li class="nav-item">
 								<form method="post" asp-action="Logout" asp-controller="Auth">

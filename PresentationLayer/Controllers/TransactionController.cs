@@ -1,10 +1,12 @@
-﻿using BussinessLayer.Services;
+﻿using BussinessLayer.Authentication;
+using BussinessLayer.Services;
 using BussinessLayer.Services.Abstraction;
 using DataLayer.Entities;
 using DataLayer.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Shared.Enums;
 
 namespace PresentationLayer.Controllers
 {
@@ -35,8 +37,14 @@ namespace PresentationLayer.Controllers
 			_voucherService = voucherService;
 		}
 
+		[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int page = 1, int pageSize = 10)
         {
+			var userRole = ClaimsPrincipalExtensions.GetUserRole(User);
+			if (userRole != RoleEnum.Admin)
+			{
+				return RedirectToAction("Create");
+			}
             var allTransactions = await _transactionService.GetAllTransactionsAsync(startDate, endDate, 0, int.MaxValue);
             int totalRecords = allTransactions.Count();
 
@@ -49,8 +57,6 @@ namespace PresentationLayer.Controllers
 
             return View(paginatedData);
         }
-
-
 
         public async Task<IActionResult> Create()
         {

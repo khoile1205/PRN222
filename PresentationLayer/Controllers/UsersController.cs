@@ -14,10 +14,11 @@ using PresentationLayer.ViewModel;
 using BussinessLayer.Services.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 using Shared.Enums;
+using System.Security.Claims;
+using BussinessLayer.Authentication;
 
 namespace PresentationLayer.Controllers
 {
-    //[Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserService userService;
@@ -207,6 +208,73 @@ namespace PresentationLayer.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public async Task<IActionResult> Profile()
+        {
+            var userId = ClaimsPrincipalExtensions.GetUserId(User);
+            var user = await userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
+        }
+
+        [HttpGet("Users/EditProfile")]
+        public async Task<IActionResult> EditProfile()
+        {
+            var userId = ClaimsPrincipalExtensions.GetUserId(User);
+
+            var user = await userService.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Convert User entity to ProfileViewModel
+            var profileViewModel = new ProfileViewModel
+            {
+                Id = user.Id,
+                Name = user.Name,
+                PhoneNumber = user.PhoneNumber,
+                Gender = user.Gender,
+                ImageUrl = user.Avatar 
+            };
+
+            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+                .Cast<Gender>()
+                .Select(g => new { Id = (int)g, Name = g.ToString() }), "Id", "Name", (int)user.Gender);
+
+            return View(profileViewModel);
+        }
+
+
+        [HttpPost("Users/EditProfile")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(ProfileViewModel profileViewModel)
+        {
+            var userId = ClaimsPrincipalExtensions.GetUserId(User);
+
+            if (userId == null || userId != profileViewModel.Id)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await userService.UpdateUserProfile(userId, profileViewModel.Name, profileViewModel.PhoneNumber, profileViewModel.Gender, profileViewModel.ImageUrl);
+                TempData["SuccessMessage"] = "Profile updated successfully!";
+                return RedirectToAction("Profile");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return View();
+        }
+
 
     }
 }
