@@ -43,7 +43,6 @@ namespace BussinessLayer.Services
                 return new LoginResponseDTO
                 {
                     AccessToken = token,
-                    UserId = existingUser.Id.ToString(),
                 };
             }
             catch (Exception ex)

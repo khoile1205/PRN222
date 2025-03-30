@@ -13,7 +13,7 @@ namespace BussinessLayer.Services.Abstraction
         Task<ShiftStaff?> GetShiftRequestByIdAsync(string id);
         Task RequestShiftAsync(ShiftStaff shiftStaff);
         Task UpdateShiftStatusAsync(string requestId, string newStatus);
-
+        Task<PaginationResult<ShiftStaff>> GetShiftRequestsByStaffId(string staffId, int pageNumber = 1, int pageSize = 10, int? month = null, int? year = null);
         // Add up
         Task<List<ShiftStaff>> GetApprovedShiftRequestsByDateRangeAsync(DateTime startDate, DateTime endDate);
 

@@ -71,15 +71,35 @@ namespace BussinessLayer.ServiceManager
                         ValidAudience = configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
                     };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse();
+                            context.Response.Redirect("/Auth/Login");
+                            return Task.CompletedTask;
+                        }
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnForbidden = context =>
+                        {
+                            context.Response.Redirect("/Auth/AccessDenied");
+                            return Task.CompletedTask;
+
+                        }
+                    };
                 })
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
-            {
-                options.LoginPath = "/Auth/Login";
-                options.LogoutPath = "/Auth/Logout";
-                options.AccessDeniedPath = "/Auth/AccessDenied";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-                options.SlidingExpiration = true;
-            });
+                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+                 {
+                     options.LoginPath = "/Auth/Login";
+                     options.LogoutPath = "/Auth/Logout";
+                     options.AccessDeniedPath = "/Auth/AccessDenied";
+                     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                     options.SlidingExpiration = true;
+                 });
             services.AddAuthorization();
             #endregion
         }

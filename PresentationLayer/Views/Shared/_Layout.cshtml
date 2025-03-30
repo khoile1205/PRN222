@@ -46,6 +46,11 @@
 								</a>
 								<ul class="dropdown-menu" aria-labelledby="managementDropdown">
 									<li class="nav-item">
+										<a class="dropdown-item" asp-area="" asp-controller="Transaction" asp-action="Index">
+											<i class="fa-solid fa-table"></i> Transactions
+										</a>
+									</li>
+									<li class="nav-item">
 										<a class="dropdown-item" asp-area="" asp-controller="Table" asp-action="Index">
 											<i class="fa-solid fa-table"></i> Tables
 										</a>
@@ -92,18 +97,8 @@
 								</a>
 								<ul class="dropdown-menu" aria-labelledby="staffManagementDropdown">
 									<li>
-										<a class="dropdown-item" asp-area="" asp-controller="Transaction" asp-action="Index">
-											<i class="fa-solid fa-file-invoice"></i> Transactions
-										</a>
-									</li>
-									<li>
 										<a class="dropdown-item" asp-area="" asp-controller="Salary" asp-action="Index">
 											<i class="fa-solid fa-money-bill"></i> Salary
-										</a>
-									</li>
-									<li>
-										<a class="dropdown-item" asp-area="" asp-controller="Shift" asp-action="Index">
-											<i class="fa-solid fa-table"></i> View fixed shifts
 										</a>
 									</li>
 									<li>

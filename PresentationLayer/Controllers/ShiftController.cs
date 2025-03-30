@@ -8,10 +8,11 @@ using BussinessLayer.Helper;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using PresentationLayer.ViewModel;
+using BussinessLayer.Authentication;
+using System.Drawing.Printing;
 
 namespace PresentationLayer.Controllers
 {
-    [Authorize(Roles = "Admin,Staff")]
     public class ShiftController : Controller
     {
         private readonly IShiftService _shiftService;
@@ -25,26 +26,25 @@ namespace PresentationLayer.Controllers
             _userService = userService;
         }
 
-        // View all shifts (for Admin or Staff)
-        public async Task<IActionResult> Index()
-        {
-            var shifts = await _shiftService.GetAllShiftsAsync();
-            return View(shifts);
-        }
-
-        // Staff requests shift
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> RequestShift()
         {
             var shifts = await _shiftService.GetAllShiftsAsync();
-            ViewData["ShiftId"] = new SelectList(shifts, "Id", "Description");
+            var shiftList = shifts.Select(s => new
+            {
+                Id = s.Id,
+                Description = $"{s.Description} ({s.StartTime} - {s.EndTime})"
+            });
+            ViewData["ShiftId"] = new SelectList(shiftList, "Id", "Description");
             return View();
         }
 
+        [Authorize(Roles = "Staff")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RequestShift([Bind("ShiftId,ShiftDate")] ShiftStaff shiftStaff)
         {
-            var staffId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var staffId = ClaimsPrincipalExtensions.GetUserId(User);
             if (string.IsNullOrEmpty(staffId))
             {
                 Console.WriteLine("StaffId is missing in claims! Redirecting to login.");
@@ -86,32 +86,28 @@ namespace PresentationLayer.Controllers
             }
         }
 
-
-
-        // View all my requests (Staff)
-        public async Task<IActionResult> MyRequests()
+        [Authorize(Roles = "Staff")]
+        public async Task<IActionResult> MyRequests(int pageNumber = 1, int pageSize = 10, int? month = null, int? year = null)
         {
-            var staffId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var staffId = ClaimsPrincipalExtensions.GetUserId(User);
             if (string.IsNullOrEmpty(staffId))
             {
                 Console.WriteLine("StaffId is missing in claims! Redirecting to login.");
                 return RedirectToAction("Login", "Auth");
             }
             Console.WriteLine($"Retrieved StaffId: {staffId}");
-
-
-            var requests = await _shiftStaffService.GetAllShiftRequestsAsync();
-            var myRequests = requests.Where(r => r.StaffId == staffId).ToList();
-            return View(myRequests);
+            var result = await _shiftStaffService.GetShiftRequestsByStaffId(staffId, pageNumber, pageSize, month, year);
+            return View(result);
         }
 
-        // Approve/Reject shift requests (Admin)
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ApproveRequests()
         {
             var requests = await _shiftStaffService.GetAllShiftRequestsAsync();
             return View(requests.Where(r => r.Status == RequestStatus.Pending).ToList());
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> ApproveShift(string requestId)
         {
@@ -120,6 +116,7 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("ApproveRequests");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> RejectShift(string requestId)
         {
@@ -130,7 +127,6 @@ namespace PresentationLayer.Controllers
 
         //Add up
 
-        // Admin view for upcoming approved shifts in calendar form
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ShiftCalendar()
         {

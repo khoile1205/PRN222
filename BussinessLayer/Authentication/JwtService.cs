@@ -10,9 +10,9 @@ namespace BussinessLayer.Authentication
 {
     public interface IJwtService
     {
-        string GenerateToken(string userId, string username, RoleEnum role);
-        bool ValidateToken(string token);
-        ClaimsPrincipal? GetClaimsFromToken(string token);
+        public string GenerateToken(string userId, string username, RoleEnum role);
+        public bool ValidateToken(string token);
+        public ClaimsPrincipal? GetClaimsFromToken(string token);
     }
 
     public class JwtService : IJwtService
@@ -33,7 +33,6 @@ namespace BussinessLayer.Authentication
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(ClaimTypes.NameIdentifier, userId), // Add NameIdentifier for middleware-based claim use
                 new Claim(JwtRegisteredClaimNames.UniqueName, username),
                 new Claim(ClaimTypes.Role, role.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

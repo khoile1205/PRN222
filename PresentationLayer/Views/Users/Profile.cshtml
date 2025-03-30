@@ -3,22 +3,100 @@
     ViewData["Title"] = "User Profile";
 }
 
-<h2>User Profile</h2>
+<h2 class="text-center mb-4">User Profile</h2>
 
+<div class="container profile-card">
+    <div class="row g-4">
+        <!-- Avatar Section -->
+        <div class="col-md-4 text-center">
+            <div class="avatar-container">
+                <img src="@(Model.Avatar ?? "")"
+                     alt="User Avatar"
+                     class="avatar-img img-fluid rounded-circle shadow-sm" />
+            </div>
+        </div>
 
-
-<div class="profile-container">
-    <div class="avatar-frame">
-        <img src="@(string.IsNullOrEmpty(Model.Avatar) ? Url.Content("~/images/default-avatar.png") : Model.Avatar)"
-             alt="Avatar"
-             class="avatar-img" />
-    </div>
-    <div class="info-container">
-        <h3>@Model.Name</h3>
-        <p><strong>Username:</strong> @Model.UserName</p>
-        <p><strong>Email:</strong> @Model.Email</p>
-        <p><strong>Phone:</strong> @Model.PhoneNumber</p>
-        <p><strong>Gender:</strong> @(Model.Gender == 0 ? "Male" : "Female")</p>
-        <a asp-action="EditProfile" class="btn btn-primary">Edit Profile</a>
+        <!-- Info Section -->
+        <div class="col-md-8">
+            <div class="info-card p-4 shadow-sm rounded">
+                <h3 class="mb-3">@Model.Name</h3>
+                <div class="info-item">
+                    <strong>Username:</strong> <span>@Model.UserName</span>
+                </div>
+                <div class="info-item">
+                    <strong>Email:</strong> <span>@Model.Email</span>
+                </div>
+                <div class="info-item">
+                    <strong>Phone:</strong> <span>@Model.PhoneNumber</span>
+                </div>
+                <div class="info-item">
+                    <strong>Gender:</strong> <span>@(Model.Gender == 0 ? "Male" : "Female")</span>
+                </div>
+                <a asp-action="EditProfile" class="btn btn-primary mt-3 transition-btn">Edit Profile</a>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Custom Styles -->
+<style>
+    .profile-card {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .avatar-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .avatar-img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 4px solid #fff;
+        transition: transform 0.3s ease;
+    }
+
+    .avatar-img:hover {
+        transform: scale(1.05);
+    }
+
+    .info-card {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-item strong {
+        color: #333;
+        font-weight: 600;
+        width: 30%;
+    }
+
+    .info-item span {
+        color: #666;
+        width: 70%;
+        text-align: right;
+    }
+
+    .transition-btn {
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .transition-btn:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }
+</style>

@@ -15,10 +15,10 @@ using BussinessLayer.Services.Abstraction;
 using Microsoft.AspNetCore.Authorization;
 using Shared.Enums;
 using System.Security.Claims;
+using BussinessLayer.Authentication;
 
 namespace PresentationLayer.Controllers
 {
-    //[Authorize(Roles = "Admin")]
     public class UsersController : Controller
     {
         private readonly IUserService userService;
@@ -211,12 +211,7 @@ namespace PresentationLayer.Controllers
 
         public async Task<IActionResult> Profile()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
-
+            var userId = ClaimsPrincipalExtensions.GetUserId(User);
             var user = await userService.GetUserById(userId);
             if (user == null)
             {
@@ -229,11 +224,7 @@ namespace PresentationLayer.Controllers
         [HttpGet("Users/EditProfile")]
         public async Task<IActionResult> EditProfile()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                return RedirectToAction("Login", "Auth");
-            }
+            var userId = ClaimsPrincipalExtensions.GetUserId(User);
 
             var user = await userService.GetUserById(userId);
             if (user == null)
@@ -247,7 +238,8 @@ namespace PresentationLayer.Controllers
                 Id = user.Id,
                 Name = user.Name,
                 PhoneNumber = user.PhoneNumber,
-                Gender = user.Gender
+                Gender = user.Gender,
+                ImageUrl = user.Avatar 
             };
 
             ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
@@ -260,17 +252,18 @@ namespace PresentationLayer.Controllers
 
         [HttpPost("Users/EditProfile")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProfile(string id, string name, string phoneNumber, Gender gender)
+        public async Task<IActionResult> EditProfile(ProfileViewModel profileViewModel)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null || userId != id)
+            var userId = ClaimsPrincipalExtensions.GetUserId(User);
+
+            if (userId == null || userId != profileViewModel.Id)
             {
                 return Unauthorized();
             }
 
             try
             {
-                await userService.UpdateUserProfile(userId, name, phoneNumber, gender);
+                await userService.UpdateUserProfile(userId, profileViewModel.Name, profileViewModel.PhoneNumber, profileViewModel.Gender, profileViewModel.ImageUrl);
                 TempData["SuccessMessage"] = "Profile updated successfully!";
                 return RedirectToAction("Profile");
             }

@@ -42,7 +42,7 @@ namespace BussinessLayer.Services
             await _userRepository.UpdateAsync(user);
         }
 
-        public async Task UpdateUserProfile(string userId, string name, string phoneNumber, Gender gender)
+        public async Task UpdateUserProfile(string userId, string name, string phoneNumber, Gender gender, string avatar)
         {
             var existingUser = await _userRepository.GetAsync(u => u.Id == userId);
             if (existingUser == null) throw new Exception("User not found");
@@ -50,6 +50,7 @@ namespace BussinessLayer.Services
             existingUser.Name = name;
             existingUser.PhoneNumber = phoneNumber;
             existingUser.Gender = gender;
+            existingUser.Avatar = avatar;
             existingUser.UpdatedAt = TimeHelper.GetVietnamTime();
 
             await _userRepository.UpdateAsync(existingUser);

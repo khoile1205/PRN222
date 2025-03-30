@@ -38,7 +38,6 @@ namespace PresentationLayer.Controllers
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, response.UserId),
                     new Claim(ClaimTypes.Name, loginRequestDTO.Username),
                     new Claim("JWT", response.AccessToken)
                 };
@@ -62,8 +61,6 @@ namespace PresentationLayer.Controllers
 
                 TempData["SuccessMessage"] = "Login successfully";
 
-                Console.WriteLine($"✅ Login success: UserId = {response.UserId}, Username = {loginRequestDTO.Username}");
-
 
                 return RedirectToAction("Index", "Home");
             }
@@ -84,6 +81,12 @@ namespace PresentationLayer.Controllers
             Response.Cookies.Delete("Token");
 
             return RedirectToAction("Login", "Auth");
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

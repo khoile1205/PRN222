@@ -9,21 +9,45 @@ using DataLayer.Repositories;
 using DataLayer.Repositories.Abstraction;
 using BussinessLayer.Helper;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BussinessLayer.Services
 {
     public class ShiftStaffService : IShiftStaffService
     {
         private readonly IGenericRepository<ShiftStaff> _shiftStaffRepository;
+        private readonly IPaginationRepository<ShiftStaff> _shiftStaffPaginationRepository;
 
-        public ShiftStaffService(IGenericRepository<ShiftStaff> shiftStaffRepository)
+        public ShiftStaffService(IGenericRepository<ShiftStaff> shiftStaffRepository, IPaginationRepository<ShiftStaff> shiftStaffPaginationRepository)
         {
             _shiftStaffRepository = shiftStaffRepository;
+            _shiftStaffPaginationRepository = shiftStaffPaginationRepository;
         }
 
         public async Task<IEnumerable<ShiftStaff>> GetAllShiftRequestsAsync()
         {
             return await _shiftStaffRepository.GetAllAsync(includes: ss => ss.Include(x => x.Shift).Include(x => x.Staff));
+        }
+
+        public async Task<PaginationResult<ShiftStaff>> GetShiftRequestsByStaffId(string staffId, int pageNumber = 1, int pageSize = 10, int? month = null, int? year = null)
+        {
+            var currentDate = DateTime.Now;
+            month ??= currentDate.Month;
+            year ??= currentDate.Year;
+
+            Expression<Func<ShiftStaff, bool>> filter = r => r.StaffId == staffId
+            && r.ShiftDate.Month == month.Value
+            && r.ShiftDate.Year == year.Value;
+
+            var listShiftStaff = await _shiftStaffPaginationRepository.GetPaginatedAsync(
+                        pageNumber: pageNumber,
+                        pageSize: pageSize,
+                        filter: filter,
+                    includes: q => q.Include(r => r.Staff).Include(r => r.Shift)
+                    );
+            listShiftStaff.Data = listShiftStaff.Data.OrderByDescending(r => r.ShiftDate).ToList();
+
+            return listShiftStaff;
         }
 
         public async Task<ShiftStaff?> GetShiftRequestByIdAsync(string id)

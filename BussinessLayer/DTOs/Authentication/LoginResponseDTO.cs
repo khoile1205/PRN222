@@ -9,6 +9,5 @@ namespace BussinessLayer.DTOs.Authentication
     public class LoginResponseDTO
     {
         public string AccessToken { get; set; }
-        public string UserId { get; set; }
     }
 }
