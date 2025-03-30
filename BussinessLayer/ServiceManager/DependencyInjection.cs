@@ -7,16 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using BussinessLayer.Authentication;
-using AutoMapper;
-using System.ComponentModel;
 
 namespace BussinessLayer.ServiceManager
 {
@@ -36,8 +30,6 @@ namespace BussinessLayer.ServiceManager
 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped(typeof(IPaginationRepository<>), typeof(PaginationRepository<>));
-            services.AddScoped<IShiftRepository, ShiftRepository>();
-            services.AddScoped<IShiftStaffRepository, ShiftStaffRepository>();
             #endregion
 
             #region Services

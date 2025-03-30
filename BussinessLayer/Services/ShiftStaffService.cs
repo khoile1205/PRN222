@@ -14,9 +14,9 @@ namespace BussinessLayer.Services
 {
     public class ShiftStaffService : IShiftStaffService
     {
-        private readonly IShiftStaffRepository _shiftStaffRepository;
+        private readonly IGenericRepository<ShiftStaff> _shiftStaffRepository;
 
-        public ShiftStaffService(IShiftStaffRepository shiftStaffRepository)
+        public ShiftStaffService(IGenericRepository<ShiftStaff> shiftStaffRepository)
         {
             _shiftStaffRepository = shiftStaffRepository;
         }
@@ -69,7 +69,5 @@ namespace BussinessLayer.Services
             return results.ToList();
         }
 
-
     }
 }
-
