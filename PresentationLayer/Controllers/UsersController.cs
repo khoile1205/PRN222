@@ -240,53 +240,48 @@ namespace PresentationLayer.Controllers
             {
                 return NotFound();
             }
-            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
-                                        .Cast<Gender>()
-                                        .Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name", (int)user.Gender);
 
-            return View(user);
+            // Convert User entity to ProfileViewModel
+            var profileViewModel = new ProfileViewModel
+            {
+                Id = user.Id,
+                Name = user.Name,
+                PhoneNumber = user.PhoneNumber,
+                Gender = user.Gender
+            };
+
+            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
+                .Cast<Gender>()
+                .Select(g => new { Id = (int)g, Name = g.ToString() }), "Id", "Name", (int)user.Gender);
+
+            return View(profileViewModel);
         }
+
 
         [HttpPost("Users/EditProfile")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProfile([Bind("Id,Name,PhoneNumber,Email,Gender")] User user)
+        public async Task<IActionResult> EditProfile(string id, string name, string phoneNumber, Gender gender)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null || userId != user.Id)
+            if (userId == null || userId != id)
             {
                 return Unauthorized();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    var existingUser = await userService.GetUserById(userId);
-                    if (existingUser == null) return NotFound();
-
-                    // Only update allowed fields
-                    existingUser.Name = user.Name;
-                    existingUser.PhoneNumber = user.PhoneNumber;
-                    existingUser.Email = user.Email;
-                    existingUser.Gender = user.Gender;
-                    existingUser.UpdatedAt = TimeHelper.GetVietnamTime();
-
-                    await userService.UpdateUser(existingUser);
-
-                    TempData["SuccessMessage"] = "Profile updated successfully!";
-                    return RedirectToAction("Profile");
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    TempData["ErrorMessage"] = "Data has been changed, please try again!";
-                }
+                await userService.UpdateUserProfile(userId, name, phoneNumber, gender);
+                TempData["SuccessMessage"] = "Profile updated successfully!";
+                return RedirectToAction("Profile");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
             }
 
-            ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
-                .Cast<Gender>().Select(g => new { Id = (int)g, Name = g.ToString() }), "Id", "Name", (int)user.Gender);
-
-            return View(user);
+            return View();
         }
+
 
     }
 }
