@@ -1,18 +1,31 @@
-﻿<div class="d-flex justify-content-center mt-4 gap-3">
+﻿@{
+    var routeData = new RouteValueDictionary(ViewContext.RouteData.Values);
+
+    foreach (var kvp in Context.Request.Query)
+    {
+        if (kvp.Key != "pageNumber" && kvp.Key != "searchQuery" && kvp.Key != "pageSize")
+        {
+            routeData[kvp.Key] = kvp.Value.ToString();
+        }
+    }
+
+    routeData["pageSize"] = Model.PageSize;
+
+}
+
+<div class="d-flex justify-content-center mt-4 gap-3">
     <nav aria-label="Page navigation">
         <ul class="pagination">
-            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")  me-2">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-pageNumber="@(Model.PageNumber - 1)"
-                   asp-route-searchQuery="@ViewBag.SearchQuery"
-                   asp-route-pageSize="@Model.PageSize"
-                   tabindex="-1">Previous</a>
+            <li class="page-item @(Model.HasPreviousPage ? "" : "disabled") me-2">
+                @{
+                    routeData["pageNumber"] = Model.PageNumber - 1;
+                }
+                <a class="page-link" href="@Url.RouteUrl(routeData)" tabindex="-1">Previous</a>
             </li>
 
             @for (int i = Math.Max(1, Model.PageNumber - 1); i <= Math.Min(Model.TotalPages, Model.PageNumber + 1); i++)
             {
-                @if (i == Model.PageNumber)
+                if (i == Model.PageNumber)
                 {
                     <li class="page-item active me-2">
                         <span class="page-link">@i</span>
@@ -20,26 +33,19 @@
                 }
                 else
                 {
+                    routeData["pageNumber"] = i;
+
                     <li class="page-item me-2">
-                        <a class="page-link"
-                           asp-action="Index"
-                           asp-route-pageNumber="@i"
-                           asp-route-searchQuery="@ViewBag.SearchQuery"
-                           asp-route-pageSize="@Model.PageSize">
-                            @i
-                        </a>
+                        <a class="page-link" href="@Url.RouteUrl(routeData)">@i</a>
                     </li>
                 }
             }
 
             <li class="page-item @(Model.HasNextPage ? "" : "disabled") me-2">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-pageNumber="@(Model.PageNumber + 1)"
-                   asp-route-searchQuery="@ViewBag.SearchQuery"
-                   asp-route-pageSize="@Model.PageSize">
-                    Next
-                </a>
+                @{
+                    routeData["pageNumber"] = Model.PageNumber + 1;
+                }
+                <a class="page-link" href="@Url.RouteUrl(routeData)">Next</a>
             </li>
         </ul>
     </nav>
