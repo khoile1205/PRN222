@@ -1,4 +1,5 @@
-﻿@model DataLayer.Entities.User
+﻿@using Shared.Constants
+@model DataLayer.Entities.User
 
 @{
     ViewData["Title"] = "Create User";
@@ -13,6 +14,12 @@
     .form-control-limited {
         max-width: 570px;
     }
+
+    .avatar-section {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="container mt-5">
@@ -24,6 +31,21 @@
             <form asp-action="Create" method="post">
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <!-- Avatar Section -->
+                <div class="avatar-section">
+                    <h5 class="text-secondary"><i class="fa fa-image"></i> Profile Picture</h5>
+                    <div class="form-group">
+                        <label asp-for="Avatar" class="control-label">Upload Image</label>
+                        <input asp-for="Avatar" class="form-control form-control-limited" id="Avatar" hidden readonly placeholder="Image URL" />
+                        <span asp-validation-for="Avatar" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <partial name="_UploadImagePartial" view-data='@(new ViewDataDictionary(ViewData) { { "Path", CloudinaryPathName.USER } })' />
+                    </div>
+                </div>
+
+                <!-- Main Form Sections -->
                 <div class="row">
                     <!-- Individual Information -->
                     <div class="col-md-6">
@@ -52,12 +74,6 @@
                             <label asp-for="Email" class="control-label"></label>
                             <input asp-for="Email" type="email" class="form-control form-control-limited" placeholder="Enter email" />
                             <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label asp-for="Avatar" class="control-label"></label>
-                            <input asp-for="Avatar" class="form-control form-control-limited" placeholder="Enter avatar URL" />
-                            <span asp-validation-for="Avatar" class="text-danger"></span>
                         </div>
 
                         <div class="form-group">
@@ -109,20 +125,19 @@
                         <input asp-for="StartDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" hidden />
                     </div>
                 </div>
+
+                <!-- Buttons -->
                 <div class="row mt-4">
                     <div class="col-2 text-left">
                         <a asp-action="Index" class="btn btn-warning" style="width: 90px;">
                             <i class="fa fa-arrow-left"></i> Back
                         </a>
                     </div>
-
                     <div class="col-8 text-center">
                         <input type="submit" value="Create" class="btn btn-success" style="width: 100px;" />
                     </div>
-
                     <div class="col-2"></div>
                 </div>
-
             </form>
         </div>
     </div>

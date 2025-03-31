@@ -91,7 +91,7 @@
 
 				<div id="hidden-inputs"></div>
 
-				<button type="submit" class="btn btn-custom w-100 mt-3" onclick="prepareOrder()">Order</button>
+				<button type="submit" id="btn_order" class="btn btn-custom w-100 mt-3" onclick="prepareOrder()" disabled>Order</button>
 			</div>
 		</div>
 	</div>
@@ -132,6 +132,7 @@
     function renderOrderList() {
         const orderListElement = document.getElementById('order-list');
         const grandTotalElement = document.getElementById('grand-total');
+        const orderButton = document.getElementById('btn_order');
         let grandTotal = 0;
 
         orderListElement.innerHTML = '';
@@ -140,20 +141,22 @@
             grandTotal += itemTotal;
 
             orderListElement.innerHTML += `
-                                <tr>
-                                    <td>${item.name}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-danger" type="button" onclick="updateQuantity('${item.id}', -1)">-</button>
-                                        ${item.quantity}
-                                        <button class="btn btn-sm btn-success" type="button" onclick="updateQuantity('${item.id}', 1)">+</button>
-                                    </td>
-                                    <td>${item.price.toLocaleString()}</td>
-                                    <td>${itemTotal.toLocaleString()}</td>
-                                </tr>
-                            `;
+                <tr>
+                    <td>${item.name}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" type="button" onclick="updateQuantity('${item.id}', -1)">-</button>
+                        ${item.quantity}
+                        <button class="btn btn-sm btn-success" type="button" onclick="updateQuantity('${item.id}', 1)">+</button>
+                    </td>
+                    <td>${item.price.toLocaleString()}</td>
+                    <td>${itemTotal.toLocaleString()}</td>
+                </tr>
+            `;
         });
         grandTotalElement.innerText = `${grandTotal.toLocaleString()} VND`;
         calculateTotalPrice()
+
+        orderButton.disabled = orderList.length === 0;
     }
 
     function calculateTotalPrice() {
@@ -212,7 +215,7 @@
         let voucherCode = document.getElementById("voucherCode").value.trim();
 
         if (!voucherCode) {
-            alert("Please Enter Voucher Code");
+            toastr.warning("Please enter a voucher code."); 
             return;
         }
 
@@ -228,9 +231,10 @@
                 appliedVoucher = data;
                 let discountAmount = getDiscountAmount();
                 document.getElementById("discountAmount").innerText = discountAmount.toLocaleString();
+                toastr.success(`Voucher applied !`); // Success message
             })
             .catch(error => {
-                alert(error.message);
+                toastr.error(error.message); // Error message
                 voucherCodeInput.value = "";
                 let totalPrice = getListOrderPrice();
                 document.getElementById("discountAmount").innerText = "0";

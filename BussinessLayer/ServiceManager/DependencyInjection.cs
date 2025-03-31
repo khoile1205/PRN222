@@ -58,7 +58,11 @@ namespace BussinessLayer.ServiceManager
 
             #region JWT Authentication
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -77,18 +81,14 @@ namespace BussinessLayer.ServiceManager
                         OnChallenge = context =>
                         {
                             context.HandleResponse();
-                            context.Response.Redirect("/Auth/Login");
+                            var returnUrl = context.Request.Path + context.Request.QueryString;
+                            context.Response.Redirect($"/Auth/Login?returnUrl={Uri.EscapeDataString(returnUrl)}");
                             return Task.CompletedTask;
-                        }
-                    };
-
-                    options.Events = new JwtBearerEvents
-                    {
+                        },
                         OnForbidden = context =>
                         {
                             context.Response.Redirect("/Auth/AccessDenied");
                             return Task.CompletedTask;
-
                         }
                     };
                 })

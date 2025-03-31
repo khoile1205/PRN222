@@ -1,4 +1,5 @@
-﻿@model DataLayer.Entities.User
+﻿@using Shared.Constants
+@model DataLayer.Entities.User
 
 @{
     ViewData["Title"] = "Edit User";
@@ -13,6 +14,12 @@
     .form-control-limited {
         max-width: 570px;
     }
+
+    .avatar-section {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="container mt-5">
@@ -25,69 +32,106 @@
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="StartDate" />
 
-                <div class="form-group">
-                    <label asp-for="UserName" class="control-label"></label>
-                    <input asp-for="UserName" class="form-control form-control-limited" placeholder="Enter username" />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
+                <!-- Avatar Section -->
+                <div class="avatar-section">
+                    <h5 class="text-secondary"><i class="fa fa-image"></i> Profile Picture</h5>
+                    <div class="form-group">
+                        <label asp-for="Avatar" class="control-label">Current Avatar</label>
+                        <input asp-for="Avatar" class="form-control form-control-limited" id="Avatar" hidden readonly placeholder="Image URL" />
+                        <span asp-validation-for="Avatar" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <partial name="_UploadImagePartial" view-data='@(new ViewDataDictionary(ViewData) { { "Path", CloudinaryPathName.USER }, { "ImageUrl", Model.Avatar} })' />
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="Password" class="control-label"></label>
-                    <input type="password" class="form-control form-control-limited" value="********" readonly />
-                    <input type="hidden" asp-for="Password" />
+                <!-- Main Form Sections -->
+                <div class="row">
+                    <!-- Individual Information -->
+                    <div class="col-md-6">
+                        <h5 class="text-secondary"><i class="fa fa-id-badge"></i> Individual Information</h5>
+
+                        <div class="form-group">
+                            <label asp-for="UserName" class="control-label">Username</label>
+                            <input asp-for="UserName" class="form-control form-control-limited" placeholder="Enter username" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+
+                        <input type="hidden" asp-for="Password" />
+
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber" class="control-label">Phone Number</label>
+                            <input asp-for="PhoneNumber" class="form-control form-control-limited" placeholder="Enter phone number" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label">Email Address</label>
+                            <input asp-for="Email" class="form-control form-control-limited" placeholder="Enter email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label">Full Name</label>
+                            <input asp-for="Name" class="form-control form-control-limited" placeholder="Enter full name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DateOfBirth" class="control-label">Date of Birth</label>
+                            <input asp-for="DateOfBirth" type="date" class="form-control form-control-limited" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Gender" class="control-label">Gender</label>
+                            <select asp-for="Gender" class="form-control form-control-limited" asp-items="ViewBag.GenderList">
+                                <option value="">Select Gender</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Working Information -->
+                    <div class="col-md-6">
+                        <h5 class="text-secondary"><i class="fa fa-briefcase"></i> Working Information</h5>
+
+                        <div class="form-group">
+                            <label asp-for="Position" class="control-label">Position</label>
+                            <input asp-for="Position" class="form-control form-control-limited" placeholder="Enter position" />
+                            <span asp-validation-for="Position" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="RoleId" class="control-label">Role</label>
+                            <select asp-for="RoleId" class="form-control form-control-limited" asp-items="ViewBag.RoleId">
+                                <option value="">Select Role</option>
+                            </select>
+                            <span asp-validation-for="RoleId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="StartDate" class="control-label">Start Date</label>
+                            <input asp-for="StartDate" type="date" class="form-control form-control-limited" />
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+
+                        <input asp-for="StartDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" hidden />
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="PhoneNumber" class="control-label"></label>
-                    <input asp-for="PhoneNumber" class="form-control form-control-limited" placeholder="Enter phone number" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Email" class="control-label"></label>
-                    <input asp-for="Email" class="form-control form-control-limited" placeholder="Enter email" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control form-control-limited" placeholder="Enter full name" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="DateOfBirth" class="control-label"></label>
-                    <input asp-for="DateOfBirth" type="date" class="form-control form-control-limited" />
-                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Gender" class="control-label"></label>
-                    <select asp-for="Gender" class="form-control form-control-limited" asp-items="ViewBag.GenderList">
-                        <option value="">Select Gender</option>
-                    </select>
-                    <span asp-validation-for="Gender" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="Position" class="control-label"></label>
-                    <input asp-for="Position" class="form-control form-control-limited" placeholder="Enter position" />
-                    <span asp-validation-for="Position" class="text-danger"></span>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="RoleId" class="control-label"></label>
-                    <select asp-for="RoleId" class="form-control form-control-limited" asp-items="ViewBag.RoleId">
-                        <option value="">Select Role</option>
-                    </select>
-                    <span asp-validation-for="RoleId" class="text-danger"></span>
-                </div>
-
-                <div class="form-group text-center mt-4">
-                    <input type="submit" value="Save" class="btn btn-success" />
-                    <a asp-action="Index" class="btn btn-secondary ml-2">Back to List</a>
+                <!-- Buttons -->
+                <div class="row mt-4">
+                    <div class="col-2 text-left">
+                        <a asp-action="Index" class="btn btn-warning" style="width: 90px;">
+                            <i class="fa fa-arrow-left"></i> Back
+                        </a>
+                    </div>
+                    <div class="col-8 text-center">
+                        <input type="submit" value="Save" class="btn btn-success" style="width: 100px;" />
+                    </div>
+                    <div class="col-2"></div>
                 </div>
             </form>
         </div>
@@ -95,5 +139,7 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
