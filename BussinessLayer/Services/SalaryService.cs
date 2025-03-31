@@ -37,6 +37,7 @@ namespace BussinessLayer.Services
             {
                 DateTime startOfMonth = DateTimeHelper.GetStartOfMonth(month, year);
                 DateTime endOfMonth = DateTimeHelper.GetEndOfMonth(month, year);
+                DateTime currentVietnamTime = TimeHelper.GetVietnamTime();
 
                 var existingStaff = await _userRepository.GetAsync(u => u.Id == staffId, includes: q => q.Include(u => u.Role));
                 if (existingStaff == null)
@@ -48,6 +49,8 @@ namespace BussinessLayer.Services
                     filter: s => s.StaffId == staffId
                                 && s.ShiftDate >= startOfMonth
                                 && s.ShiftDate <= endOfMonth
+                                && (s.ShiftDate < currentVietnamTime.Date ||
+                                   (s.ShiftDate == currentVietnamTime.Date && s.Shift != null && s.Shift.StartTime <= currentVietnamTime.TimeOfDay))
                                 && s.Status == RequestStatus.Accepted,
                     includes: q => q.Include(s => s.Shift)
                                     .Include(s => s.Staff).ThenInclude(s => s.Role)
