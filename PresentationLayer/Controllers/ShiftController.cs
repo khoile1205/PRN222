@@ -95,8 +95,12 @@ namespace PresentationLayer.Controllers
                 Console.WriteLine("StaffId is missing in claims! Redirecting to login.");
                 return RedirectToAction("Login", "Auth");
             }
-            Console.WriteLine($"Retrieved StaffId: {staffId}");
-            var result = await _shiftStaffService.GetShiftRequestsByStaffId(staffId, pageNumber, pageSize, month, year);
+
+            var currentDate = DateTime.Now;
+            int resolvedMonth = month ?? currentDate.Month;
+            int resolvedYear = year ?? currentDate.Year;
+
+            var result = await _shiftStaffService.GetShiftRequestsByStaffId(staffId, resolvedMonth, resolvedYear, pageNumber, pageSize);
             return View(result);
         }
 
