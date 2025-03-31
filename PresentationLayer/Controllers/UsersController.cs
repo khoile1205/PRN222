@@ -128,12 +128,6 @@ namespace PresentationLayer.Controllers
         {
             user.Id = id;
             ModelState.Remove("Role");
-            var existingUser = await userService.GetUserByUserName(user.UserName);
-            if (existingUser != null)
-            {
-                ModelState.AddModelError("UserName", "Username is already taken.");
-            }
-
             if (ModelState.IsValid)
             {
                 try

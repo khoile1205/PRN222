@@ -11,9 +11,6 @@ namespace DataLayer.Entities
         public DbSet<Role> Roles { get; set; }
         public DbSet<Shift> Shifts { get; set; }
         public DbSet<ShiftStaff> ShiftStaff { get; set; }
-        public DbSet<InventoryCategory> InventoryCategories { get; set; }
-        public DbSet<Inventory> Inventories { get; set; }
-        public DbSet<InventoryUpdateHistory> InventoryUpdateHistories { get; set; }
         public DbSet<Voucher> Vouchers { get; set; }
         public DbSet<BeverageCategory> BeverageCategories { get; set; }
         public DbSet<Beverage> Beverages { get; set; }
@@ -101,16 +98,6 @@ namespace DataLayer.Entities
                 .WithMany(c => c.Beverages)
                 .HasForeignKey(b => b.CategoryId);
 
-            // Inventory relation
-            modelBuilder.Entity<InventoryCategory>()
-                .HasMany(ic => ic.Inventories)
-                .WithOne(i => i.InventoryCategory)
-                .HasForeignKey(i => i.CategoryId);
-
-            modelBuilder.Entity<Inventory>()
-                .HasMany(i => i.InventoryUpdateHistory)
-                .WithOne(iuh => iuh.Inventory)
-                .HasForeignKey(i => i.InventoryId);
         }
 
         public void SeedData()
