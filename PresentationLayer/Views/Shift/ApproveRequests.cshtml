@@ -1,10 +1,39 @@
 ﻿@model IEnumerable<DataLayer.Entities.ShiftStaff>
-
 @{
     ViewData["Title"] = "Approve Shift Requests";
+    var startDate = ViewBag.StartDate != null ? Convert.ToDateTime(ViewBag.StartDate).ToString("yyyy-MM-dd") : DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd");
+    var endDate = ViewBag.EndDate != null ? Convert.ToDateTime(ViewBag.EndDate).ToString("yyyy-MM-dd") : DateTime.Now.ToString("yyyy-MM-dd");
 }
-
 <h2>Pending Shift Requests</h2>
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Filter Requests</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="ApproveRequests" method="get">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>From Date:</label>
+                        <input type="date" name="startDate" value="@startDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>To Date:</label>
+                        <input type="date" name="endDate" value="@endDate" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="btn-group w-100">
+                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <a href="@Url.Action("ApproveRequests")" class="btn btn-secondary">Reset</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 
 <table class="table table-striped">
     <thead>
@@ -29,7 +58,6 @@
                         <input type="hidden" name="requestId" value="@request.Id" />
                         <button type="submit" class="btn btn-success">Approve</button>
                     </form>
-
                     <form asp-action="RejectShift" method="post" style="display:inline;">
                         <input type="hidden" name="requestId" value="@request.Id" />
                         <button type="submit" class="btn btn-danger">Reject</button>
