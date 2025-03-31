@@ -105,10 +105,25 @@ namespace PresentationLayer.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ApproveRequests()
+        public async Task<IActionResult> ApproveRequests(DateTime? startDate, DateTime? endDate)
         {
+            if (!startDate.HasValue)
+                startDate = DateTime.Now.AddDays(-7);
+
+            if (!endDate.HasValue)
+                endDate = DateTime.Now;
+            endDate = endDate.Value.AddDays(1).AddSeconds(-1);
+            ViewBag.StartDate = startDate;
+            ViewBag.EndDate = endDate;
+
             var requests = await _shiftStaffService.GetAllShiftRequestsAsync();
-            return View(requests.Where(r => r.Status == RequestStatus.Pending).ToList());
+            var filteredRequests = requests.Where(r =>
+                    r.Status == RequestStatus.Pending &&
+                    r.ShiftDate >= startDate &&
+                    r.ShiftDate <= endDate
+                ).ToList();
+
+            return View(filteredRequests);
         }
 
         [Authorize(Roles = "Admin")]
