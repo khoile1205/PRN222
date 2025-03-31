@@ -95,6 +95,10 @@ namespace BussinessLayer.Services
 
             return false;
         }
+        public async Task<Table?> GetTableByNameAsync(string tableName)
+        {
+            return await _tableRepository.GetAsync(t => t.TableName == tableName && t.DeletedAt == null);
+        }
 
     }
 }
