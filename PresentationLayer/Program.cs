@@ -9,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 var dependencyInjection = new DependencyInjection();
 dependencyInjection.ConfigureServices(builder.Services, builder.Configuration);
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+    
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

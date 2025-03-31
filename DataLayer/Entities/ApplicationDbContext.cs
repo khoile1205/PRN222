@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataLayer.Enums;
+using Microsoft.EntityFrameworkCore;
 using Shared.Enums;
 
 namespace DataLayer.Entities
@@ -168,6 +169,25 @@ namespace DataLayer.Entities
                 );
                 SaveChanges();
             }
+
+            if (!Users.Any(u => u.UserName == "admin"))
+                {
+                    Users.Add(new User
+                    {
+                        UserName = "admin",
+                        Password = "$2a$12$oobW7mZ.DCAigOjY46x7u.NwvQ9jPFRVAj1ZiSsafWV1a2FqIiXXa",
+                        PhoneNumber = "0123456789",
+                        Email = "admin@example.com",
+                        Name = "Admin User",
+                        DateOfBirth = new DateTime(1990, 1, 1),
+                        Gender = Gender.Male,
+                        Position = "Administrator",
+                        RoleId = Roles.First(r => r.RoleName == RoleEnum.Admin).Id,
+                        StartDate = DateTime.UtcNow
+                    });
+                    SaveChanges();
+                }
+
         }
     }
 }
