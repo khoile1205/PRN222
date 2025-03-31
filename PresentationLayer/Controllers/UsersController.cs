@@ -19,6 +19,7 @@ using BussinessLayer.Authentication;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize]
     public class UsersController : Controller
     {
         private readonly IUserService userService;
@@ -29,6 +30,8 @@ namespace PresentationLayer.Controllers
             this.userService = userService;
             this.roleService = roleService;
         }
+
+        [Authorize(Roles = "Admin")]
 
         // GET: Users
         public async Task<IActionResult> Index()
@@ -53,7 +56,7 @@ namespace PresentationLayer.Controllers
 
             return View(user);
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             var roles = await roleService.GetAllRoles();
@@ -64,6 +67,7 @@ namespace PresentationLayer.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserName,Password,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,RoleId,StartDate,CreatedAt,UpdatedAt,DeletedAt")] User user)
@@ -89,7 +93,7 @@ namespace PresentationLayer.Controllers
 
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
@@ -110,7 +114,7 @@ namespace PresentationLayer.Controllers
                                         .Select(gender => new { Id = (int)gender, Name = gender.ToString() }), "Id", "Name");
             return View(user);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("UserName,Password,PhoneNumber,Email,Avatar,Name,DateOfBirth,Gender,Position,RoleId,StartDate")]
@@ -143,7 +147,7 @@ namespace PresentationLayer.Controllers
             ViewData["RoleId"] = new SelectList(roles, "Id", "RoleName", user.RoleId);
             return View(user);
         }
-
+        [Authorize(Roles = "Admin")]
         public IActionResult ResetPassword(string id)
         {
             var staff = userService.GetUserById(id);
@@ -155,7 +159,7 @@ namespace PresentationLayer.Controllers
             var model = new ResetPasswordViewModel { StaffId = id };
             return View(model);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPassword)
         {
@@ -177,7 +181,7 @@ namespace PresentationLayer.Controllers
             TempData["SuccessMessage"] = "Password reset successfully.";
             return RedirectToAction("Index");
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> DeleteUser(string userId)
         {
@@ -194,6 +198,7 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreUser(string userId)
         {
             var user = await userService.GetUserById(userId);
@@ -239,7 +244,7 @@ namespace PresentationLayer.Controllers
                 Name = user.Name,
                 PhoneNumber = user.PhoneNumber,
                 Gender = user.Gender,
-                ImageUrl = user.Avatar 
+                Avatar = user.Avatar 
             };
 
             ViewData["GenderList"] = new SelectList(Enum.GetValues(typeof(Gender))
@@ -263,7 +268,7 @@ namespace PresentationLayer.Controllers
 
             try
             {
-                await userService.UpdateUserProfile(userId, profileViewModel.Name, profileViewModel.PhoneNumber, profileViewModel.Gender, profileViewModel.ImageUrl);
+                await userService.UpdateUserProfile(userId, profileViewModel.Name, profileViewModel.PhoneNumber, profileViewModel.Gender, profileViewModel.Avatar);
                 TempData["SuccessMessage"] = "Profile updated successfully!";
                 return RedirectToAction("Profile");
             }

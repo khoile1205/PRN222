@@ -14,7 +14,7 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadImage(IFormFile file, string pathName)
+        public async Task<IActionResult> UploadImage(IFormFile file, string? path = "")
         {
             if (file == null || file.Length == 0)
             {
@@ -22,7 +22,7 @@ namespace PresentationLayer.Controllers
             }
 
             using var stream = file.OpenReadStream();
-            var imageUrl = await _cloudinaryService.UploadImage(stream, pathName);
+            var imageUrl = await _cloudinaryService.UploadImage(stream, path ?? CloudinaryPathName.MAIN_FOLDER);
 
             return Json(new { success = true, imageUrl });
         }

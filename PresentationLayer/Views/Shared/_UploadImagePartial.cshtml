@@ -11,16 +11,16 @@
         <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display: none;"></span>
     </div>
     <div id="uploadResult" style="margin-top: 10px;">
-        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        @if (ViewData["ImageUrl"] != null)
         {
             @if (isAvatar)
             {
-                <img src="@Model.ImageUrl" alt="Uploaded Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; display: block; margin-top: 10px;" />
+                <img src="@(ViewData["ImageUrl"] ?? "/images/default_avatar.png")" alt="Uploaded Avatar" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; display: block; margin-top: 10px;" />
             }
             else
             {
 
-                <img src="@Model.ImageUrl" alt="Uploaded Image" style="max-width: 200px; display: block; margin-top: 10px;" />
+                <img src="@ViewData["ImageUrl"].ToString()" alt="Uploaded Image" style="max-width: 200px; display: block; margin-top: 10px;" />
             }
         }
     </div>
@@ -44,7 +44,9 @@
             var formData = new FormData();
             formData.append("file", fileInput.files[0]);
             var uploadPath = @Html.Raw(Json.Serialize(ViewData["Path"]?.ToString() ?? CloudinaryPathName.MAIN_FOLDER.ToString()));
-            formData.append("path", @Html.Raw(Json.Serialize(ViewData["Path"]?.ToString() ?? CloudinaryPathName.MAIN_FOLDER.ToString()))); $.ajax({
+            formData.append("path", @Html.Raw(Json.Serialize(ViewData["Path"]?.ToString() ?? CloudinaryPathName.MAIN_FOLDER.ToString())));
+            
+            $.ajax({
                 url: "/Upload/UploadImage",
                 type: "POST",
                 data: formData,
@@ -60,7 +62,6 @@
                         } else {
                             $imageUrlField = $form.find("input[name='ImageUrl']")
                         }
-                        console.log($imageUrlField)
                         var $previewContainer = $form.find("#currentImage");
 
                         if ($imageUrlField.length) {

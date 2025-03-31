@@ -13,7 +13,7 @@ namespace PresentationLayer.ViewModel
         public string PhoneNumber { get; set; }
         [Required(ErrorMessage = "Gender is required.")]
         public Gender Gender { get; set; }
-        public string? ImageUrl { get; set; }
+        public string? Avatar { get; set; }
     }
 
 }
