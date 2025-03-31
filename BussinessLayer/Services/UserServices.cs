@@ -16,10 +16,12 @@ namespace BussinessLayer.Services
     public class UserService : IUserService
     {
         private readonly IGenericRepository<User> _userRepository;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public UserService(IGenericRepository<User> userRepository)
+        public UserService(IGenericRepository<User> userRepository, ICloudinaryService cloudinaryService)
         {
             this._userRepository = userRepository;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task CreateUser(User user)
@@ -46,6 +48,11 @@ namespace BussinessLayer.Services
         {
             var existingUser = await _userRepository.GetAsync(u => u.Id == userId);
             if (existingUser == null) throw new Exception("User not found");
+
+            if (!string.IsNullOrEmpty(existingUser.Avatar))
+            {
+                await _cloudinaryService.DeleteImage(existingUser.Avatar);
+            }
 
             existingUser.Name = name;
             existingUser.PhoneNumber = phoneNumber;

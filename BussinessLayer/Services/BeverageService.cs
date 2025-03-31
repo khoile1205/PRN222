@@ -13,17 +13,20 @@ namespace BussinessLayer.Services
         private readonly IGenericRepository<Beverage> _beverageRepository;
         private readonly IGenericRepository<BeverageDetail> _beverageDetailRepository;
         private readonly IMapper _mapper;
+        private readonly ICloudinaryService _cloudinaryService;
 
         public BeverageService(
            IGenericRepository<Beverage> beverageRepository,
            IGenericRepository<BeverageDetail> beverageDetailRepository,
            ApplicationDbContext context,
-           IMapper mapper)
+           IMapper mapper,
+           ICloudinaryService cloudinaryService)
         {
             _beverageRepository = beverageRepository;
             _beverageDetailRepository = beverageDetailRepository;
             _mapper = mapper;
             _context = context;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task CreateAsync(CreateBeverageDTO createBeverageDTO)
@@ -92,6 +95,12 @@ namespace BussinessLayer.Services
                     throw new Exception("Beverage not found.");
                 }
 
+                if (!string.IsNullOrEmpty(beverage.Image))
+                {
+
+                    await _cloudinaryService.DeleteImage(beverage.Image);
+                }
+
                 var beverageDetails = await _beverageDetailRepository.GetAllAsync(bd => bd.BeverageId == id);
 
                 foreach (var beverageDetail in beverageDetails)
@@ -154,6 +163,10 @@ namespace BussinessLayer.Services
                     if (beverage == null)
                     {
                         throw new KeyNotFoundException("Beverage not found.");
+                    }
+                    if (!string.IsNullOrEmpty(beverage.Image))
+                    {
+                        await _cloudinaryService.DeleteImage(beverage.Image);
                     }
 
                     beverage.Name = updateBeverageDTO.Name;

@@ -20,7 +20,7 @@ namespace BussinessLayer.Middleware
 
         public async Task Invoke(HttpContext context)
         {
-            var bearerToken = context.Request.Cookies.FirstOrDefault(cookie => cookie.Key == "Token").Value;
+            var bearerToken = context.Request.Cookies.FirstOrDefault(cookie => cookie.Key == "access_token").Value;
 
             if (!string.IsNullOrEmpty(bearerToken))
             {

@@ -142,8 +142,8 @@ namespace PresentationLayer.Controllers
                     {
                         StaffName = x.Staff.Name,
                         ShiftDescription = x.Shift.Description,
-                        ShiftStartTime = x.Shift.StartTime,
-                        ShiftEndTime = x.Shift.EndTime
+                        ShiftStartTime = x.ShiftDate.Date.Add(x.Shift.StartTime),
+                        ShiftEndTime = x.ShiftDate.Date.Add(x.Shift.EndTime)
                     }).ToList()
                 }).ToList();
 

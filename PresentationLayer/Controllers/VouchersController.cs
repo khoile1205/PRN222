@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace PresentationLayer.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public class VouchersController : Controller
     {
         private readonly IVoucherService _voucherService;
@@ -47,12 +47,14 @@ namespace PresentationLayer.Controllers
             return View(voucher);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Vouchers/Create
-        public IActionResult Create() 
-        { 
+        public IActionResult Create()
+        {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: Vouchers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -78,6 +80,8 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")]
+
         // GET: Vouchers/Edit/5
         public async Task<IActionResult> Edit(string? id)
         {
@@ -93,6 +97,7 @@ namespace PresentationLayer.Controllers
             }
             return View(voucher);
         }
+        [Authorize(Roles = "Admin")]
 
         // POST: Vouchers/Edit
         [HttpPost]
@@ -127,17 +132,19 @@ namespace PresentationLayer.Controllers
                 return View(voucher);
             }
         }
+        [Authorize(Roles = "Admin")]
 
         // GET: Vouchers/Delete/5
         public async Task<IActionResult> Delete(string id)
         {
             var voucher = await _voucherService.GetVoucherByIdAsync(id);
-            if(voucher == null)
+            if (voucher == null)
                 return NotFound();
 
             return View(voucher);
         }
 
+        [Authorize(Roles = "Admin")]
         // POST: Vouchers/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -149,21 +156,21 @@ namespace PresentationLayer.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-		public async Task<IActionResult> Check(string code)
-		{
-			var voucher = await _voucherService.GetVoucherByCodeAsync(code);
+        public async Task<IActionResult> Check(string code)
+        {
+            var voucher = await _voucherService.GetVoucherByCodeAsync(code);
 
-			if (voucher == null || voucher.EndDate < DateTime.Today)
-			{
-				return NotFound();
-			}
+            if (voucher == null || voucher.EndDate < DateTime.Today)
+            {
+                return NotFound();
+            }
 
-			return Json(new
-			{
-				isValid = true,
-				percentage = voucher.Percentage,
-				maxDiscountAmount = voucher.MaxDiscountAmount
-			});
-		}
+            return Json(new
+            {
+                isValid = true,
+                percentage = voucher.Percentage,
+                maxDiscountAmount = voucher.MaxDiscountAmount
+            });
+        }
     }
 }

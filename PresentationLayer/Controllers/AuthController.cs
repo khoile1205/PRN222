@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PresentationLayer.Controllers
 {
@@ -17,14 +18,16 @@ namespace PresentationLayer.Controllers
             _authService = authService;
         }
 
-        [HttpGet]
-        public IActionResult Login()
+        [AllowAnonymous]
+        public IActionResult Login(string returnUrl = null)
         {
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginRequestDTO loginRequestDTO)
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginRequestDTO loginRequestDTO, string returnUrl = null)
         {
             try
             {
@@ -42,7 +45,6 @@ namespace PresentationLayer.Controllers
                     new Claim("JWT", response.AccessToken)
                 };
 
-
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var authProperties = new AuthenticationProperties { IsPersistent = true };
 
@@ -52,7 +54,7 @@ namespace PresentationLayer.Controllers
                     authProperties);
 
                 // Store JWT in a cookie
-                Response.Cookies.Append("Token", $"Bearer {response.AccessToken}", new CookieOptions
+                Response.Cookies.Append("access_token", $"Bearer {response.AccessToken}", new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true,
@@ -60,9 +62,9 @@ namespace PresentationLayer.Controllers
                 });
 
                 TempData["SuccessMessage"] = "Login successfully";
+                returnUrl = string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl) ? "/Transaction/Create" : returnUrl;
 
-
-                return RedirectToAction("Index", "Home");
+                return Redirect(returnUrl);
             }
             catch (Exception ex)
             {

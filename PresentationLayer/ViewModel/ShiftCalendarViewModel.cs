@@ -10,8 +10,8 @@
     {
         public required string StaffName { get; set; }
         public required string ShiftDescription { get; set; }
-        public TimeSpan ShiftStartTime { get; set; }
-        public TimeSpan ShiftEndTime { get; set; }
+        public DateTime ShiftStartTime { get; set; }
+        public DateTime ShiftEndTime { get; set; }
     }
 
 }

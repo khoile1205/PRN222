@@ -3,8 +3,8 @@
 @{
     ViewData["Title"] = "Shift Calendar";
     var staffCountPerDate = Model.ToDictionary(
-        day => day.Date.ToString("yyyy-MM-dd"),
-        day => day.Registrations.Select(x => x.StaffName).Distinct().Count()
+    day => day.Date.ToString("yyyy-MM-dd"),
+    day => day.Registrations.Select(x => x.StaffName).Distinct().Count()
     );
 }
 
@@ -50,71 +50,89 @@
                 eventContent: function (arg) {
                     return {
                         html: `
-                        <div class="custom-list-event">
-                            <strong>${arg.event.extendedProps.staffName}</strong><br>
-                            <span>${arg.event.extendedProps.shiftTime}</span><br>
-                        </div>
-                    `
+                            <div class="custom-list-event">
+                                <strong>${arg.event.extendedProps.staffName}</strong><br>
+                                ${arg.view.type == 'dayGridMonth' ? `<span>${arg.event.extendedProps.shiftTime}</span><br>` : ''}
+                            </div>
+                        `
                     };
                 },
                 events: [
-        @foreach (var day in Model)
-        {
-            foreach (var reg in day.Registrations)
-            {
-                <text>
+                    @foreach (var day in Model)
                     {
-                        title: '@reg.StaffName',
-                        start: '@day.Date.ToString("yyyy-MM-dd")',
-                        extendedProps: {
-                            staffName: '@reg.StaffName',
-                            shiftDescription: '@reg.ShiftDescription',
-                            shiftTime: '@reg.ShiftStartTime - @reg.ShiftEndTime',
-                            date: '@day.Date.ToString("yyyy-MM-dd")'
+                        foreach (var reg in day.Registrations)
+                        {
+                            <text>
+                                {
+                                    title: '@reg.StaffName',
+                                    start: '@reg.ShiftStartTime.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                    end: '@reg.ShiftEndTime.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                    allDay: false,
+                                    display: 'block',
+                                    extendedProps: {
+                                        staffName: '@reg.StaffName',
+                                        shiftDescription: '@reg.ShiftDescription',
+                                        shiftTime: '@reg.ShiftStartTime.ToString("HH:mm:ss") - @reg.ShiftEndTime.ToString("HH:mm:ss")',
+                                        date: '@day.Date.ToString("yyyy-MM-dd")'
+                                    }
+                                },
+                            </text>
                         }
-                    },
-                </text>
-            }
-        }
-                                                ],
-                dateClick: function (info) {
-                    const clickedDate = info.dateStr;
-                    let dayEvents = calendar.getEvents().filter(e =>
-                        e.startStr.startsWith(clickedDate) && e.extendedProps.staffName
-                    );
-
-                    // Sort by shift start time (assuming "HH:mm:ss - HH:mm:ss" format)
-                    dayEvents = dayEvents.sort((a, b) => {
-                        const timeA = a.extendedProps.shiftTime.split(' - ')[0];
-                        const timeB = b.extendedProps.shiftTime.split(' - ')[0];
-                        return timeA.localeCompare(timeB);
-                    });
-
-                    if (dayEvents.length > 0) {
-                        let tableHtml = `<table class="table table-bordered">
-                                                                    <thead><tr>
-                                                                        <th>Staff Name</th>
-                                                                        <th>Shift Description</th>
-                                                                        <th>Shift Time</th>
-                                                                        <th>Date</th>
-                                                                    </tr></thead><tbody>`;
-                        dayEvents.forEach(ev => {
-                            tableHtml += `<tr>
-                                                        <td>${ev.extendedProps.staffName}</td>
-                                                        <td>${ev.extendedProps.shiftDescription}</td>
-                                                        <td>${ev.extendedProps.shiftTime}</td>
-                                                        <td>${clickedDate}</td>
-                                                    </tr>`;
-                        });
-                        tableHtml += `</tbody></table>`;
-
-                        document.getElementById('shiftListModalBody').innerHTML = tableHtml;
-                        new bootstrap.Modal(document.getElementById('shiftListModal')).show();
                     }
-                }
+                ],
+                eventClick: function (info) {
+                    if (info.view.type != 'listWeek') {
+                        const clickedDate = info.event.extendedProps.date;
+                        showShiftListModal(clickedDate);
+                    }
+                },
 
+                dateClick: function (info) {
+                    showShiftListModal(info.dateStr);
+                }
             });
 
+            function showShiftListModal(date) {
+                let dayEvents = calendar.getEvents().filter(e =>
+                    e.startStr.startsWith(date) && e.extendedProps.staffName
+                );
+
+                // Sort by shift start time
+                dayEvents = dayEvents.sort((a, b) => {
+                    const timeA = a.extendedProps.shiftTime.split(' - ')[0];
+                    const timeB = b.extendedProps.shiftTime.split(' - ')[0];
+                    return timeA.localeCompare(timeB);
+                });
+
+                if (dayEvents.length > 0) {
+                    let tableHtml = `
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Staff Name</th>
+                                    <th>Shift Description</th>
+                                    <th>Shift Time</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    dayEvents.forEach(ev => {
+                        tableHtml += `
+                            <tr>
+                                <td>${ev.extendedProps.staffName}</td>
+                                <td>${ev.extendedProps.shiftDescription}</td>
+                                <td>${ev.extendedProps.shiftTime}</td>
+                                <td>${date}</td>
+                            </tr>
+                        `;
+                    });
+                    tableHtml += `</tbody></table>`;
+
+                    document.getElementById('shiftListModalBody').innerHTML = tableHtml;
+                    new bootstrap.Modal(document.getElementById('shiftListModal')).show();
+                }
+            }
             calendar.render();
         });
     </script>

@@ -1,4 +1,5 @@
-﻿@model PresentationLayer.Models.BeverageViewModel
+﻿@using Shared.Constants
+@model PresentationLayer.Models.BeverageViewModel
 @{
     ViewData["Title"] = "Create Beverage";
 }
@@ -76,12 +77,12 @@
 
                 <div class="form-group">
                     <label asp-for="ImageUrl" class="control-label">Upload Image</label>
-                    <input asp-for="ImageUrl" class="form-control form-control-limited" id="imageUrl" readonly placeholder="Image URL" />
+                    <input asp-for="ImageUrl" class="form-control form-control-limited" id="imageUrl" readonly hidden placeholder="Image URL" />
                     <span asp-validation-for="ImageUrl" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <partial name="_UploadImagePartial" />
+                    <partial name="_UploadImagePartial" view-data='@(new ViewDataDictionary(ViewData) { { "Path", CloudinaryPathName.BEVERAGE } })' />
                 </div>
 
                 <div class="form-group text-center mt-4">
@@ -123,21 +124,21 @@
                 }
 
                 var newBeverageSizeHtml = `
-                                    <div class="size-price-row row mb-2">
-                                        <div class="col">
-                                            <select name="Details[${index}].SizeId" class="form-control size-select">
-                                                ${availableSizes.map(s => `<option value="${s.Value}">${s.Text}</option>`).join('')}
-                                            </select>
-                                            <span class="text-danger" data-valmsg-for="Details[${index}].SizeId" data-valmsg-replace="true"></span>
-                                        </div>
-                                        <div class="col">
-                                            <input name="Details[${index}].Price" class="form-control" type="number" step="0.01" min="0.01" data-val="true" data-val-required="Price is required." data-val-range="Price must be greater than 0." data-val-range-min="0.01" data-val-range-max="${Number.MAX_VALUE}" />
-                                            <span class="text-danger" data-valmsg-for="Details[${index}].Price" data-valmsg-replace="true"></span>
-                                        </div>
-                                        <div class="col">
-                                            <button type="button" class="btn btn-danger remove-row">Remove</button>
-                                        </div>
-                                    </div>`;
+                    <div class="size-price-row row mb-2">
+                        <div class="col">
+                            <select name="Details[${index}].SizeId" class="form-control size-select">
+                                ${availableSizes.map(s => `<option value="${s.Value}">${s.Text}</option>`).join('')}
+                            </select>
+                            <span class="text-danger" data-valmsg-for="Details[${index}].SizeId" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col">
+                            <input name="Details[${index}].Price" class="form-control" type="number" step="0.01" min="0.01" data-val="true" data-val-required="Price is required." data-val-range="Price must be greater than 0." data-val-range-min="0.01" data-val-range-max="${Number.MAX_VALUE}" />
+                            <span class="text-danger" data-valmsg-for="Details[${index}].Price" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-danger remove-row">Remove</button>
+                        </div>
+                    </div>`;
                 $("#sizePriceContainer").append(newBeverageSizeHtml);
                 index++;
             });
