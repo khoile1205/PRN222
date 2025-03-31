@@ -7,7 +7,8 @@ namespace PresentationLayer.ViewModel
         public string StaffId { get; set; }
 
         [Required]
-        [MinLength(8, ErrorMessage = "Password needs at least 8 characters")]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\W).{8,}$",
+    ErrorMessage = "Password must be at least 8 characters long, contain at least 1 uppercase letter and 1 special character.")]
         public string NewPassword { get; set; }
     }
 }

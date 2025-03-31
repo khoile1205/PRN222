@@ -15,5 +15,6 @@ namespace BussinessLayer.Services.Abstraction
         public Task CreateUser(User user);
         public Task UpdateUser(User user);
         Task UpdateUserProfile(string userId, string name, string phoneNumber, Gender gender, string avatar);
+        public Task<User?> GetUserByUserName(string userName);
     }
 }

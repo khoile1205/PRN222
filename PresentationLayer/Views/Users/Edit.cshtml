@@ -54,8 +54,7 @@
 
                         <div class="form-group">
                             <label asp-for="UserName" class="control-label">Username</label>
-                            <input asp-for="UserName" class="form-control form-control-limited" placeholder="Enter username" />
-                            <span asp-validation-for="UserName" class="text-danger"></span>
+                            <input asp-for="UserName" class="form-control" readonly />
                         </div>
 
                         <input type="hidden" asp-for="Password" />

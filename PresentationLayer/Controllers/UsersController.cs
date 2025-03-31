@@ -74,6 +74,12 @@ namespace PresentationLayer.Controllers
         {
             ModelState.Remove("Role");
 
+            var existingUser = await userService.GetUserByUserName(user.UserName);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("UserName", "Username is already taken.");
+            }
+
             user.Id = Guid.NewGuid().ToString();
             user.Role = await roleService.GetRoleById(user.RoleId);
             user.Password = HashPasswordHelper.HashPassword(user.Password);
@@ -122,7 +128,6 @@ namespace PresentationLayer.Controllers
         {
             user.Id = id;
             ModelState.Remove("Role");
-
             if (ModelState.IsValid)
             {
                 try

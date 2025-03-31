@@ -62,6 +62,10 @@ namespace BussinessLayer.Services
 
             await _userRepository.UpdateAsync(existingUser);
         }
+        public async Task<User?> GetUserByUserName(string userName)
+        {
+            return await _userRepository.GetAsync(u => u.UserName == userName);
+        }
 
     }
 }

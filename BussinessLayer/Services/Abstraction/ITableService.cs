@@ -16,6 +16,7 @@ namespace BussinessLayer.Services.Abstraction
         Task<bool> DeleteTableAsync(string id);
         Task<IEnumerable<Table>> GetAvailableTablesAsync();
         Task<bool> RestoreTableAsync(string id);
+        Task<Table?> GetTableByNameAsync(string tableName);
 
     }
 

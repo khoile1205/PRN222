@@ -51,6 +51,11 @@ namespace PresentationLayer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Table table)
         {
+            var existingTable = await _tableService.GetTableByNameAsync(table.TableName);
+            if (existingTable != null)
+            {
+                ModelState.AddModelError("TableName", "Table name already exists.");
+            }
             ModelState.Remove("TableDetails");
 
             if (ModelState.IsValid)
@@ -88,6 +93,11 @@ namespace PresentationLayer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Table table)
         {
+            var existingTable = await _tableService.GetTableByNameAsync(table.TableName);
+			if (existingTable != null && existingTable.Id != table.Id)
+			{
+				ModelState.AddModelError("TableName", "Table name already exists.");
+            }
             ModelState.Remove("TableDetails");
 
             if (ModelState.IsValid)
