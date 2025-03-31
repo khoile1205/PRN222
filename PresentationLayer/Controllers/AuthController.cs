@@ -19,7 +19,7 @@ namespace PresentationLayer.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult Login(string returnUrl = null)
+        public IActionResult Login(string? returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             return View();
@@ -27,7 +27,7 @@ namespace PresentationLayer.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginRequestDTO loginRequestDTO, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginRequestDTO loginRequestDTO, string? returnUrl = null)
         {
             try
             {
