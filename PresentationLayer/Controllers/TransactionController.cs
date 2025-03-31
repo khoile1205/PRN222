@@ -37,14 +37,8 @@ namespace PresentationLayer.Controllers
 			_voucherService = voucherService;
 		}
 
-		[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate, int page = 1, int pageSize = 10)
         {
-			var userRole = ClaimsPrincipalExtensions.GetUserRole(User);
-			if (userRole != RoleEnum.Admin)
-			{
-				return RedirectToAction("Create");
-			}
             var allTransactions = await _transactionService.GetAllTransactionsAsync(startDate, endDate, 0, int.MaxValue);
             int totalRecords = allTransactions.Count();
 
@@ -175,6 +169,12 @@ namespace PresentationLayer.Controllers
 				.ToList();
 
 			ViewBag.Tables = await _tableService.GetAvailableTablesAsync();
+			ViewBag.PaymentTypes = new SelectList(
+				Enum.GetValues(typeof(PaymentType))
+				.Cast<PaymentType>()
+				.Select(pt => new { Id = (int)pt, Name = pt.ToString() }),
+				"Id", "Name"
+	);
 		}
 
 		public async Task<IActionResult> Details(string id)

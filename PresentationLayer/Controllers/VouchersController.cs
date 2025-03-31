@@ -147,6 +147,7 @@ namespace PresentationLayer.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [AllowAnonymous]
         [HttpGet]
 		public async Task<IActionResult> Check(string code)
 		{

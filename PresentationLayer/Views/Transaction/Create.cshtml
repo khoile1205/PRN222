@@ -77,7 +77,7 @@
 
 				<div class="mb-3 d-flex align-items-center">
 					<label for="voucherCode" class="form-label me-2">Voucher:</label>
-					<input type="text" id="voucherCode" name="VoucherCode" class="form-control w-50 me-2" placeholder="Enter voucher code" onkeypress="handleEnter(event)">
+                    <input type="text" id="voucherCode" name="VoucherCode" class="form-control w-50 me-2" placeholder="Enter voucher code">
 					<button type="button" id="applyVoucherBtn" class="btn btn-success" onclick="applyVoucher()">Discount</button>
 				</div>
 				<p><strong>Discount:</strong> <span id="discountAmount">0</span> VND</p>
@@ -175,6 +175,11 @@
     }
 
     function prepareOrder() {
+        if (orderList.length === 0) {
+            alert("Please add at least one item before order!");
+            return false;
+        }
+
         const hiddenInputsContainer = document.getElementById('hidden-inputs');
         hiddenInputsContainer.innerHTML = '';
 
